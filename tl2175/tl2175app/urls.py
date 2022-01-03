@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
 
-#URLConfiguration
+# URLConfiguration
 
-urlpatterns = []
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('upload/', views.upload_from_xslsx, name='upload')
+]

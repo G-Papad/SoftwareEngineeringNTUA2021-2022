@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tl2175app.apps.Tl2175AppConfig'
+    'tl2175app.apps.Tl2175AppConfig',
+    'import_export'
 ]
 
 MIDDLEWARE = [

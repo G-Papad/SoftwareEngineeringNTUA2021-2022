@@ -1,12 +1,13 @@
 from django.contrib import admin
-from .models import Provider, Station, Vehicle, Passes
+from .models import *
+from import_export.admin import ImportExportModelAdmin
+
 
 # Register your models here.
 
-admin.site.register(Provider)
 
-admin.site.register(Station)
+@admin.register(Provider, Station, Vehicle, Passes)
+class StationAdmin(ImportExportModelAdmin):
+    #list_display = ('stationid', 'stationProvider', 'stationName')
+    pass
 
-admin.site.register(Vehicle)
-
-admin.site.register(Passes)
