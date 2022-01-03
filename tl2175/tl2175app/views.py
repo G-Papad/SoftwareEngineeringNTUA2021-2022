@@ -9,7 +9,7 @@ from tablib import Dataset, Databook
 from django.http import HttpResponse
 
 
-def upload_from_xslsx(request):
+def upload_from_xslx(request):
     if request.method == 'POST':
         # station_resource = StationResource()
         dataset = Databook()
