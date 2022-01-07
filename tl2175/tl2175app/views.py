@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Vehicle, Passes, Station, Provider
+#from django.forms import MemberForm
 
 # Create your views here.
 
@@ -7,6 +8,35 @@ from .resources import StationResource
 from django.contrib import messages
 from tablib import Dataset, Databook
 from django.http import HttpResponse
+
+
+def transportation(request):
+    if request.method == 'POST':
+        #form = MemberForm(request.POST or None)
+        operator1 = request.POST['operator1']
+        operator2 = request.POST['operator2']
+        datefrom = request.POST['datefrom']
+        dateto = request.POST['dateto']
+
+        posts = Passes.objects.raw("""
+            select pass.*
+            FROM
+            	providers prov
+            	passes pass
+            	vehicles veh
+            	station
+            where
+            	pass.timestamp BETWEEN datefrom and dateto
+            	AND pass.stationRef = station.providerName
+            	AND station.providerName = prov.providerName
+            	AND prov.providerName = operator1
+            	AND pass.vehicleRef = veh.vehicleid
+            	AND veh.tagProvider = operator2""")
+
+
+        return render(request, 'transportation.html', {'data':posts})
+    return render(request, 'transportation.html', {})
+
 
 
 def upload_from_xslx(request):
