@@ -51,7 +51,18 @@ def upload_from_xslx(request):
 
         imported_data = dataset.load(new_station.read(), format='xlsx')
         for datasheet in imported_data.sheets():
-            if datasheet.title == 'stations':
+            print(datasheet.title)
+            if datasheet.title == 'providers':
+                for data in datasheet:
+                    if data[0] == None:
+                        break
+                    value = Provider()
+                    value.providerAbbr = data[0]
+                    value.providerName = data[1]
+                    value.iban = data[2]
+                    value.bankname = data[3]
+                    value.save()
+            elif datasheet.title == 'stations':
                 for data in datasheet:
                     if data[0] == None:
                         break
@@ -63,6 +74,7 @@ def upload_from_xslx(request):
                         providerName=data[1])
                     value.save()
             elif datasheet.title == 'vehicles_100':
+
                 for data in datasheet:
                     if data[0] == None:
                         break
