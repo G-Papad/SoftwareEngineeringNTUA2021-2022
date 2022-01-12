@@ -10,12 +10,14 @@ from tablib import Dataset, Databook
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from .serializers import *
-from django.views.decorators.csrf import *
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics
 from django.http import Http404
 from rest_framework.views import APIView
+<<<<<<< HEAD
+from datetime import datetime
+from django.db.models import Sum
+=======
 from datetime import date
 from django.db.models import Sum, Count
 
@@ -42,11 +44,34 @@ def transportation(request):
             	AND prov.providerName = operator1
             	AND pass.vehicleRef = veh.vehicleid
             	AND veh.tagProvider = operator2""")
+>>>>>>> ec546a715669a353ec8876b26ed5015e6badc943
 
 
-        return render(request, 'transportation.html', {'data':posts})
-    return render(request, 'transportation.html', {})
-
+# def transportation(request):
+#     if request.method == 'POST':
+#         # form = MemberForm(request.POST or None)
+#         operator1 = request.POST['operator1']
+#         operator2 = request.POST['operator2']
+#         datefrom = request.POST['datefrom']
+#         dateto = request.POST['dateto']
+#
+#         posts = Passes.objects.raw("""
+#             select pass.*
+#             FROM
+#             	providers prov
+#             	passes pass
+#             	vehicles veh
+#             	station
+#             where
+#             	pass.timestamp BETWEEN datefrom and dateto
+#             	AND pass.stationRef = station.providerName
+#             	AND station.providerName = prov.providerName
+#             	AND prov.providerName = operator1
+#             	AND pass.vehicleRef = veh.vehicleid
+#             	AND veh.tagProvider = operator2""")
+#
+#         return render(request, 'transportation.html', {'data': posts})
+#     return render(request, 'transportation.html', {})
 
 
 def upload_from_xslx(request):
@@ -154,16 +179,27 @@ class PassesPerStation(APIView):
     def get(self, request, pk, df, dt, format=None):
         passes = self.get_object(pk, df, dt)
         serializer = PassesSerializer(passes, many=True)
-        index=0
-        for data in serializer.data :
-            index+=1
+        header = {}
+        header["Station"] = pk
+        station = passes[0].passes_fk1
+        header["StationOperator"] = station.stationProvider
+        header["RequestTimeStamp"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        header["PeriodFrom"] = df
+        header["PeriodTo"] = dt
+        header["NumberOfPasses"] = passes.count()
+
+        augmented_serializer_data = list(serializer.data)
+        augmented_serializer_data.insert(0, header)
+        index = 0
+        for data in serializer.data:
+            index += 1
             Vehicle = passes[index-1].passes_fk2
             Vehicle_tagProvider = Vehicle.tagProvider
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
 
-        return Response(serializer.data)
+        return Response(augmented_serializer_data)
 
 class PassesCost(APIView):
     def get_object(self, op1, op2, df, dt):
@@ -172,6 +208,26 @@ class PassesCost(APIView):
         except Passes.DoesNotExist:
             raise Http404
 
+<<<<<<< HEAD
+    def get(self, request, op1_ID, op2_ID, df, dt, format=None):
+        passes = self.get_object(op1_ID, op2_ID, df, dt)
+        serializer = PassesSerializer(passes, many=True)
+
+        info = {}
+        info["NumberOfPasses"] = passes.count()
+        info["op1_ID"] = op1_ID
+        info["op2_ID"] = op2_ID
+        info["PeriodFrom"] = df
+        info["PeriodTo"] = dt
+        #info["RequestTimeStamp"]=date.today()
+        index = 0
+        for data in serializer.data:
+            index += 1
+            data["PassIndex"] = index
+            data.pop("pass_type")
+        #serializer.data.insert(info)
+
+=======
     def get(self, request, op1, op2, df, dt, format=None):
         passes = self.get_object(op1, op2, df, dt)
         provider = Provider.objects.filter(providerAbbr=op1)
@@ -216,4 +272,32 @@ class ChargesBy(APIView):
         #     #Vehicle_tagProvider = Vehicle.tagProvider
         #     data["Oparator2"] = Vehicle
         #     idx += 1
+>>>>>>> ec546a715669a353ec8876b26ed5015e6badc943
+        return Response(serializer.data)
+
+
+class PassesCost(APIView):
+    def get_object(self, op1, op2, df, dt):
+        try:
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, op1, op2, df, dt, format=None):
+        passes = self.get_object(op1, op2, df, dt)
+        provider = Provider.objects.filter(providerAbbr=op1)
+        # serializer = PassesSerializer(passes, many=True)
+        serializer = ProviderSerializer(provider, many=True)
+        for data in serializer.data:
+            data["Operator1"] = op1
+            data["Operator2"] = op2
+            data["RequestTimestamp"] = date.today()
+            data["PeriodFrom"] = df
+            data["PeriodTo"] = dt
+            data["NumberOfPasses"] = passes.count()
+            data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
+            data.pop("providerAbbr")
+            data.pop("providerName")
+            data.pop("iban")
+            data.pop("bankname")
         return Response(serializer.data)
