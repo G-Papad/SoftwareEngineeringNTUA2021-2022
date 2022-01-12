@@ -15,6 +15,8 @@ urlpatterns = [
          views.PassesAnalysis.as_view()),
     path('PassesCost/<str:op1>/<str:op2>/<str:df>/<str:dt>/',
          views.PassesCost.as_view()),
+    path('ChargesBy/<str:op1>/<str:df>/<str:dt>/',
+         views.ChargesBy.as_view()),
     # path('transportation/', views.transportation, name='transportation')
 ]
 

@@ -230,3 +230,21 @@ class PassesCost(APIView):
             data.pop("iban")
             data.pop("bankname")
         return Response(serializer.data)
+
+class ChargesBy(APIView):
+    def get_object(self, op1, op2, df, dt):
+        try:
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, op1, df, dt, format=None):
+        response = [{"opID":op1, "RequestTimeStamp":datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom":df,
+        "PeriodTo":dt}]
+        for provider in Provider.objects.all():
+            op2 = provider.providerAbbr
+            if op2 == op1: continue
+            passes = self.get_object(op1, op2, df, dt)
+            dict = {"VisitingOperator":op2, "NumberOfPasses":passes.count(), "PassesCost":passes.aggregate(Sum('charge'))["charge__sum"]}
+            response.append(dict)
+        return Response(response)
