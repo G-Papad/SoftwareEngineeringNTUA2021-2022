@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from django.http import Http404
 from rest_framework.views import APIView
-from drf_multiple_model.views import ObjectMultipleModelAPIView
+
 
 
 def transportation(request):
@@ -161,5 +161,5 @@ class PassesPerStation(APIView):
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
-        
+
         return Response(serializer.data)
