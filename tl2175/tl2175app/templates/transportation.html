@@ -1,0 +1,32 @@
+{% extends 'index.html' %}
+
+{% block content %}
+  <form method = "POST" action="{%url 'transportation'%}">
+    {% csrf_token %}
+    <label for="operator1">Operator 1:</label><br>
+    <select id="operator1" name="operator1">
+      <option value="kentriki_odos">Kentriki Odos</option>
+      <option value="aodos">Aodos</option>
+      <option value="gefyra">Gefyra</option>
+      <option value="egnatia">Egnatia</option>
+      <option value="moreas">Moreas</option>
+      <option value="nea_odos">Nea Odos</option>
+      <option value="olympia_odos">Olympia Odos</option>
+    </select><br>
+    <label for="operator2">Operator 2:</label><br>
+    <select id="operator2" name="operator2">
+      <option value="kentriki_odos">Kentriki Odos</option>
+      <option value="aodos">Aodos</option>
+      <option value="gefyra">Gefyra</option>
+      <option value="egnatia">Egnatia</option>
+      <option value="moreas">Moreas</option>
+      <option value="nea_odos">Nea Odos</option>
+      <option value="olympia_odos">Olympia Odos</option>
+    </select><br>
+    <label for="datefrom">datefrom:</label><br>
+    <input type="date" id="datefrom" name="Date from" value="{{datefrom}}"><br>
+    <label for="dateto">dateto:</label><br>
+    <input type="date" id="dateto" name="Date to" value="{{dateto}}"><br>
+    <input type="submit" value="Submit"><br>
+  </form>
+{% endblock %}
