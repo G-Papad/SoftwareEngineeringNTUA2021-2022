@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  <h1>Members DB:</h1>
+  <ul>
+    {% for item in all %}
+      <strong>{{ item.fname }}  {{ item.lname }}</strong><br/>
+      <li>Email: {{ item.email }}</li>
+      <li>Age: {{ item.age }}</li><br/>
+      <hr>
+    {% endfor %}
+  </ul>
+{% endblock %}
