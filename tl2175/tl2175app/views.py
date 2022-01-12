@@ -16,8 +16,6 @@ from rest_framework.response import Response
 from rest_framework import generics
 from django.http import Http404
 from rest_framework.views import APIView
-from drf_multiple_model.views import ObjectMultipleModelAPIView
-
 
 def transportation(request):
     if request.method == 'POST':
@@ -161,5 +159,33 @@ class PassesPerStation(APIView):
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
-        
+
+        return Response(serializer.data)
+
+
+class PassesAnalysis(APIView):
+    def get_object(self, op1_ID, op2_ID, df, dt):
+        try:
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__tagProviderAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, op1_ID, op2_ID, df, dt, format=None):
+        passes = self.get_object(op1_ID, op2_ID, df, dt)
+        serializer = PassesSerializer(passes, many=True)
+
+        info={}
+        info["NumberOfPasses"]=passes.count()
+        info["op1_ID"]=op1_ID
+        info["op2_ID"]=op2_ID
+        info["PeriodFrom"]=df
+        info["PeriodTo"]=dt
+        #info["RequestTimeStamp"]=date.today()
+        index=0
+        for data in serializer.data:
+            index+=1
+            data["PassIndex"] = index
+            data.pop("pass_type")
+        #serializer.data.insert(info)
+
         return Response(serializer.data)
