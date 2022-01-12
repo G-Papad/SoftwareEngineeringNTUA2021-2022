@@ -6,7 +6,15 @@ from .models import Vehicle, Passes, Station, Provider
 from .resources import StationResource
 from django.contrib import messages
 from tablib import Dataset, Databook
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from rest_framework.parsers import JSONParser
+from .serializers import *
+from django.views.decorators.csrf import *
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import generics
+from django.http import Http404
+from rest_framework.views import APIView
 
 
 def upload_from_xslx(request):
@@ -85,3 +93,33 @@ def index(request):
         'passes': passes,
         'stations': stations,
         'providers': providers})
+
+
+class Providers_list(generics.ListCreateAPIView):
+    queryset = Provider.objects.all()
+    serializer_class = ProviderSerializer
+
+
+class Providers_Details(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Provider.objects.all()
+    serializer_class = ProviderSerializer
+
+
+# class PassesPerStation(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Passes.objects.filter(passes_fk1__stationid=pk).exclude(
+#         timestamp__gte=dt).filter(timestamp_gte=df)
+#     serializer_class = PassesSerializer
+
+#  Passes.objects.filter(charge='2.8').filter(stationRef='KO01')
+
+class PassesPerStation(APIView):
+    def get_object(self, pk, df, dt):
+        try:
+            return Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, df, dt, format=None):
+        passes = self.get_object(pk, df, dt)
+        serializer = PassesSerializer(passes, many=True)
+        return Response(serializer.data)

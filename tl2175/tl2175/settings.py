@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tl2175app.apps.Tl2175AppConfig',
-    'import_export'
+    'import_export',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
