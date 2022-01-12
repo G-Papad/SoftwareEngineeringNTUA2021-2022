@@ -54,6 +54,13 @@ class Passes(models.Model):
         Station, on_delete=models.CASCADE, default='', db_constraint=False)
     passes_fk2 = models.ForeignKey(
         Vehicle, on_delete=models.CASCADE, default='', db_constraint=False)
+    
+    def __get_pass_type(self):
+        if(self.passes_fk1.stationProvider == self.passes_fk2.tagProvider):
+            return "home"
+        return "visitor"
+
+    pass_type = property(__get_pass_type)
 
     def __str__(self):
         return self.passid
