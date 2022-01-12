@@ -9,7 +9,6 @@ class ProviderSerializer(serializers.ModelSerializer):
         fields = ('providerAbbr', 'providerName', 'iban', 'bankname')
 
 class StationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Station
         fields = ('stationid', 'stationProvider',
@@ -22,7 +21,6 @@ class VehicleSerializer(serializers.ModelSerializer):
                   'tagProvider', 'tagProviderAbbr', 'vehicle_fk1')
 
 class PassesSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Passes
         fields = ('passid', 'timestamp', 'charge', 'stationRef',

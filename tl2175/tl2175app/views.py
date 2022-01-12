@@ -16,7 +16,12 @@ from rest_framework.response import Response
 from rest_framework import generics
 from django.http import Http404
 from rest_framework.views import APIView
+<<<<<<< HEAD
 
+=======
+from datetime import date
+from django.db.models import Sum, Count
+>>>>>>> ec546a715669a353ec8876b26ed5015e6badc943
 
 
 def transportation(request):
@@ -162,4 +167,57 @@ class PassesPerStation(APIView):
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
 
+        return Response(serializer.data)
+
+class PassesCost(APIView):
+    def get_object(self, op1, op2, df, dt):
+        try:
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, op1, op2, df, dt, format=None):
+        passes = self.get_object(op1, op2, df, dt)
+        provider = Provider.objects.filter(providerAbbr=op1)
+        #serializer1 = PassesSerializer(passes, many=True)
+        serializer = ProviderSerializer(provider, many=True)
+        for data in serializer.data:
+            data["Operator1"] = op1
+            data["Operator2"] = op2
+            data["RequestTimestamp"] = date.today()
+            data["PeriodFrom"] = df
+            data["PeriodTo"] = dt
+            data["NumberOfPasses"] = passes.count()
+            data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
+            data.pop("providerAbbr")
+            data.pop("providerName")
+            data.pop("iban")
+            data.pop("bankname")
+        return Response(serializer.data)
+
+class ChargesBy(APIView):
+    def get_object(self, op1, df, dt):
+        try:
+            return Passes.objects.select_related('passes_fk2').filter(passes_fk1__station_fk__providerAbbr=op1).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, op1, df, dt, format=None):
+        passes = self.get_object(op1, df, dt)
+        #new_table = passes.values('passes_fk2.tagProvider').order_by().annotate(Count('passes_fk2.tagProvider'))
+        provider = Provider.objects.filter(providerAbbr=op1)
+        serializer = PassesSerializer(passes, many=True)
+        #serializer1 = ProviderSerializer(provider, many=True)
+        for data in serializer.data:
+            data["Operator1"] = op1
+            data["RequestTimestamp"] = date.today()
+            data["PeriodFrom"] = df
+            data["PeriodTo"] = dt
+            data["PPOList"] = passes.count()
+        # idx = 0
+        # for data in serializer1.data:
+        #     Vehicle = passes[idx].annotate(Count('passes_fk2.tagProvider'), distinct=True)
+        #     #Vehicle_tagProvider = Vehicle.tagProvider
+        #     data["Oparator2"] = Vehicle
+        #     idx += 1
         return Response(serializer.data)
