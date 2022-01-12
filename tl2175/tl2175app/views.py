@@ -154,7 +154,8 @@ class PassesPerStation(APIView):
         header["Station"] = pk
         station = passes[0].passes_fk1
         header["StationOperator"] = station.stationProvider
-        header["RequestTimeStamp"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        header["RequestTimeStamp"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S")
         header["PeriodFrom"] = df
         header["PeriodTo"] = dt
         header["NumberOfPasses"] = passes.count()
@@ -183,22 +184,24 @@ class PassesAnalysis(APIView):
     def get(self, request, op1_ID, op2_ID, df, dt, format=None):
         passes = self.get_object(op1_ID, op2_ID, df, dt)
         serializer = PassesSerializer(passes, many=True)
+        augmented_serializer_data = list(serializer.data)
 
         info = {}
-        info["NumberOfPasses"] = passes.count()
         info["op1_ID"] = op1_ID
         info["op2_ID"] = op2_ID
+        info["RequestTimeStamp"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S")
         info["PeriodFrom"] = df
         info["PeriodTo"] = dt
-        #info["RequestTimeStamp"]=date.today()
+        info["NumberOfPasses"] = passes.count()
+        augmented_serializer_data.insert(0, info)
         index = 0
         for data in serializer.data:
             index += 1
             data["PassIndex"] = index
             data.pop("pass_type")
-        #serializer.data.insert(info)
 
-        return Response(serializer.data)
+        return Response(augmented_serializer_data)
 
 
 class PassesCost(APIView):
@@ -216,7 +219,8 @@ class PassesCost(APIView):
         for data in serializer.data:
             data["Operator1"] = op1
             data["Operator2"] = op2
-            data["RequestTimestamp"] = date.today()
+            data["RequestTimestamp"] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S")
             data["PeriodFrom"] = df
             data["PeriodTo"] = dt
             data["NumberOfPasses"] = passes.count()
@@ -226,3 +230,21 @@ class PassesCost(APIView):
             data.pop("iban")
             data.pop("bankname")
         return Response(serializer.data)
+
+class ChargesBy(APIView):
+    def get_object(self, op1, op2, df, dt):
+        try:
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        except Passes.DoesNotExist:
+            raise Http404
+
+    def get(self, request, op1, df, dt, format=None):
+        response = [{"opID":op1, "RequestTimeStamp":datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom":df,
+        "PeriodTo":dt}]
+        for provider in Provider.objects.all():
+            op2 = provider.providerAbbr
+            if op2 == op1: continue
+            passes = self.get_object(op1, op2, df, dt)
+            dict = {"VisitingOperator":op2, "NumberOfPasses":passes.count(), "PassesCost":passes.aggregate(Sum('charge'))["charge__sum"]}
+            response.append(dict)
+        return Response(response)
