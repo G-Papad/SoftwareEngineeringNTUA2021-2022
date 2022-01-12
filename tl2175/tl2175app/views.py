@@ -16,12 +16,8 @@ from rest_framework.response import Response
 from rest_framework import generics
 from django.http import Http404
 from rest_framework.views import APIView
-<<<<<<< HEAD
-
-=======
 from datetime import date
 from django.db.models import Sum, Count
->>>>>>> ec546a715669a353ec8876b26ed5015e6badc943
 
 
 def transportation(request):
