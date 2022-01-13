@@ -25,3 +25,8 @@ class PassesSerializer(serializers.ModelSerializer):
         model = Passes
         fields = ('passid', 'timestamp', 'charge', 'stationRef',
                   'vehicleRef', 'pass_type')    
+
+class PassesSerializerAll(serializers.ModelSerializer):
+    class Meta:
+        model = Passes
+        fields = '__all__'

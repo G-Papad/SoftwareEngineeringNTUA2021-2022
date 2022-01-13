@@ -74,7 +74,7 @@ def upload_from_xslx(request):
                         break
                     value = Station()
                     value.stationid = data[0]
-                    value.stationProvider = data[1]
+                    #value.stationProvider = data[1]
                     value.stationName = data[2]
                     value.station_fk = Provider.objects.get(
                         providerName=data[1])
@@ -88,8 +88,8 @@ def upload_from_xslx(request):
                     value.vehicleid = data[0]
                     value.tagid = data[1]
                     value.licenceYear = data[4]
-                    value.tagProvider = data[2]
-                    value.tagProviderAbbr = data[3]
+                    #value.tagProvider = data[2]
+                    #value.tagProviderAbbr = data[3]
                     value.vehicle_fk1 = Provider.objects.get(
                         providerName=data[2])
                     value.save()
@@ -101,8 +101,8 @@ def upload_from_xslx(request):
                     value.passid = data[0]
                     value.timestamp = data[1]
                     value.charge = data[4]
-                    value.stationRef = data[2]
-                    value.vehicleRef = data[3]
+                    #value.stationRef = data[2]
+                    #value.vehicleRef = data[3]
                     value.passes_fk1 = Station.objects.get(stationid=data[2])
                     value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
                     value.save()
@@ -248,3 +248,17 @@ class ChargesBy(APIView):
             dict = {"VisitingOperator":op2, "NumberOfPasses":passes.count(), "PassesCost":passes.aggregate(Sum('charge'))["charge__sum"]}
             response.append(dict)
         return Response(response)
+
+
+class PassesUpdate(APIView):
+    def get(self, request, format=None):
+        snippets = Passes.objects.all()
+        serializer = PassesSerializerAll(snippets, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = PassesSerializerAll(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
