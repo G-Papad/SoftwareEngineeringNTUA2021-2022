@@ -288,6 +288,9 @@ class resetpasses(APIView):
         except:
             return Response([{"status": "failed"}])
 
+# Δεν δουλευει με απλο path το open για καποιο λογο
+# οποτε εβαλα το full path του δικου μου υπολογιστη
+# Δε θα σας δουλευει αν δεν αλλαξετε το path
 
 class resetstations(APIView):
     def post(self, request):
