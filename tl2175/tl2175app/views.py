@@ -16,6 +16,9 @@ from django.http import Http404
 from rest_framework.views import APIView
 from datetime import datetime
 from django.db.models import Sum
+from django.db import connection
+from django.db.utils import OperationalError
+import csv
 
 
 # def transportation(request):
@@ -231,6 +234,7 @@ class PassesCost(APIView):
             data.pop("bankname")
         return Response(serializer.data)
 
+
 class ChargesBy(APIView):
     def get_object(self, op1, op2, df, dt):
         try:
@@ -239,19 +243,21 @@ class ChargesBy(APIView):
             raise Http404
 
     def get(self, request, op1, df, dt, format=None):
-        response = [{"opID":op1, "RequestTimeStamp":datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom":df,
-        "PeriodTo":dt}]
+        response = [{"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
+                     "PeriodTo": dt}]
         for provider in Provider.objects.all():
             op2 = provider.providerAbbr
-            if op2 == op1: continue
+            if op2 == op1:
+                continue
             passes = self.get_object(op1, op2, df, dt)
-            dict = {"VisitingOperator":op2, "NumberOfPasses":passes.count(), "PassesCost":passes.aggregate(Sum('charge'))["charge__sum"]}
+            dict = {"VisitingOperator": op2, "NumberOfPasses": passes.count(
+            ), "PassesCost": passes.aggregate(Sum('charge'))["charge__sum"]}
             response.append(dict)
         return Response(response)
 
 
 class PassesUpdate(APIView):
-    def get(self, request, format=None):
+    def get(self, request):
         snippets = Passes.objects.all()
         serializer = PassesSerializerAll(snippets, many=True)
         return Response(serializer.data)
@@ -262,3 +268,71 @@ class PassesUpdate(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class healthcheck(APIView):
+    def get(self, request):
+        try:
+            connection.ensure_connection()
+            return Response([{"status": "OK", "dbconnection": "connectionstring"}])
+        except OperationalError:
+            return Response([{"status": "failed"}])
+
+
+class resetpasses(APIView):
+    def post(self, request):
+        try:
+            for instance in Passes.objects.all().iterator():
+                instance.delete()
+            return Response([{"status": "OK"}])
+        except:
+            return Response([{"status": "failed"}])
+
+
+class resetstations(APIView):
+    def post(self, request):
+        try:
+            for instance in Station.objects.all().iterator():
+                instance.delete()
+            f = open(
+                "C:/Users/PANAGIOTIS/OneDrive/Έγγραφα/SoftEng_7o/TL21-75/tl2175/tl2175app/starting_data/sampledata01_stations.csv", "r")
+            csvreader = csv.reader(f, delimiter=';')
+            header = next(csvreader)
+            for row in csvreader:
+                value = Station()
+                value.stationid = row[0]
+                value.stationName = row[2]
+                value.station_fk = Provider.objects.get(
+                    providerName=row[1])
+                value.save()
+            return Response([{"status": "OK"}])
+        except BaseException as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+            return Response([{"status": "failed", "error type": str(err)}])
+        except:
+            return Response([{"status": "failed"}])
+
+
+class resetvehicles(APIView):
+    def post(self, request):
+        try:
+            for instance in Vehicle.objects.all().iterator():
+                instance.delete()
+            f = open(
+                "C:/Users/PANAGIOTIS/OneDrive/Έγγραφα/SoftEng_7o/TL21-75/tl2175/tl2175app/starting_data/sampledata01_vehicles_100.csv", "r")
+            csvreader = csv.reader(f, delimiter=';')
+            header = next(csvreader)
+            for row in csvreader:
+                value = Vehicle()
+                value.vehicleid = row[0]
+                value.tagid = row[1]
+                value.licenceYear = row[4]
+                value.vehicle_fk1 = Provider.objects.get(
+                    providerName=row[2])
+                value.save()
+            return Response([{"status": "OK"}])
+        except BaseException as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+            return Response([{"status": "failed", "error type": str(err)}])
+        except:
+            return Response([{"status": "failed"}])
