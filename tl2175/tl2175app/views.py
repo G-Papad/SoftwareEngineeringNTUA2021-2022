@@ -292,13 +292,14 @@ class resetpasses(APIView):
 # οποτε εβαλα το full path του δικου μου υπολογιστη
 # Δε θα σας δουλευει αν δεν αλλαξετε το path
 
+
 class resetstations(APIView):
     def post(self, request):
         try:
             for instance in Station.objects.all().iterator():
                 instance.delete()
             f = open(
-                "C:/Users/PANAGIOTIS/OneDrive/Έγγραφα/SoftEng_7o/TL21-75/tl2175/tl2175app/starting_data/sampledata01_stations.csv", "r")
+                "tl2175app/starting_data/sampledata01_stations.csv", "r")
             csvreader = csv.reader(f, delimiter=';')
             header = next(csvreader)
             for row in csvreader:
@@ -322,7 +323,7 @@ class resetvehicles(APIView):
             for instance in Vehicle.objects.all().iterator():
                 instance.delete()
             f = open(
-                "C:/Users/PANAGIOTIS/OneDrive/Έγγραφα/SoftEng_7o/TL21-75/tl2175/tl2175app/starting_data/sampledata01_vehicles_100.csv", "r")
+                "tl2175app/starting_data/sampledata01_vehicles_100.csv", "r")
             csvreader = csv.reader(f, delimiter=';')
             header = next(csvreader)
             for row in csvreader:
