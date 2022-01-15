@@ -298,17 +298,16 @@ class resetstations(APIView):
         try:
             for instance in Station.objects.all().iterator():
                 instance.delete()
-            f = open(
-                "tl2175app/starting_data/sampledata01_stations.csv", "r")
-            csvreader = csv.reader(f, delimiter=';')
-            header = next(csvreader)
-            for row in csvreader:
-                value = Station()
-                value.stationid = row[0]
-                value.stationName = row[2]
-                value.station_fk = Provider.objects.get(
-                    providerName=row[1])
-                value.save()
+            with open("tl2175app/starting_data/sampledata01_stations.csv", "r") as f:
+                csvreader = csv.reader(f, delimiter=';')
+                header = next(csvreader)
+                for row in csvreader:
+                    value = Station()
+                    value.stationid = row[0]
+                    value.stationName = row[2]
+                    value.station_fk = Provider.objects.get(
+                        providerName=row[1])
+                    value.save()
             return Response([{"status": "OK"}])
         except BaseException as err:
             print(f"Unexpected {err=}, {type(err)=}")
@@ -322,18 +321,17 @@ class resetvehicles(APIView):
         try:
             for instance in Vehicle.objects.all().iterator():
                 instance.delete()
-            f = open(
-                "tl2175app/starting_data/sampledata01_vehicles_100.csv", "r")
-            csvreader = csv.reader(f, delimiter=';')
-            header = next(csvreader)
-            for row in csvreader:
-                value = Vehicle()
-                value.vehicleid = row[0]
-                value.tagid = row[1]
-                value.licenceYear = row[4]
-                value.vehicle_fk1 = Provider.objects.get(
-                    providerName=row[2])
-                value.save()
+            with open("tl2175app/starting_data/sampledata01_vehicles_100.csv", "r") as f:
+                csvreader = csv.reader(f, delimiter=';')
+                header = next(csvreader)
+                for row in csvreader:
+                    value = Vehicle()
+                    value.vehicleid = row[0]
+                    value.tagid = row[1]
+                    value.licenceYear = row[4]
+                    value.vehicle_fk1 = Provider.objects.get(
+                        providerName=row[2])
+                    value.save()
             return Response([{"status": "OK"}])
         except BaseException as err:
             print(f"Unexpected {err=}, {type(err)=}")
