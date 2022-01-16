@@ -18,10 +18,6 @@ from django.urls import path, include
 from tl2175app import views
 
 urlpatterns = [
-    path('admin/healthcheck', views.healthcheck.as_view()),
-    path('admin/resetpasses', views.resetpasses.as_view()),
-    path('admin/resetstations', views.resetstations.as_view()),
-    path('admin/resetvehicles', views.resetvehicles.as_view()),
     path('admin/', admin.site.urls),
     path('interoperability/api/', include('tl2175app.urls')),
     #path('__debug__/', include('debug_toolbar.urls')),

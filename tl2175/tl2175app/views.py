@@ -21,33 +21,6 @@ from django.db.utils import OperationalError
 import csv
 
 
-# def transportation(request):
-#     if request.method == 'POST':
-#         # form = MemberForm(request.POST or None)
-#         operator1 = request.POST['operator1']
-#         operator2 = request.POST['operator2']
-#         datefrom = request.POST['datefrom']
-#         dateto = request.POST['dateto']
-#
-#         posts = Passes.objects.raw("""
-#             select pass.*
-#             FROM
-#             	providers prov
-#             	passes pass
-#             	vehicles veh
-#             	station
-#             where
-#             	pass.timestamp BETWEEN datefrom and dateto
-#             	AND pass.stationRef = station.providerName
-#             	AND station.providerName = prov.providerName
-#             	AND prov.providerName = operator1
-#             	AND pass.vehicleRef = veh.vehicleid
-#             	AND veh.tagProvider = operator2""")
-#
-#         return render(request, 'transportation.html', {'data': posts})
-#     return render(request, 'transportation.html', {})
-
-
 def upload_from_xslx(request):
     if request.method == 'POST':
         # station_resource = StationResource()
@@ -125,23 +98,6 @@ def index(request):
         'stations': stations,
         'providers': providers})
 
-
-class Providers_list(generics.ListCreateAPIView):
-    queryset = Provider.objects.all()
-    serializer_class = ProviderSerializer
-
-
-class Providers_Details(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Provider.objects.all()
-    serializer_class = ProviderSerializer
-
-
-# class PassesPerStation(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Passes.objects.filter(passes_fk1__stationid=pk).exclude(
-#         timestamp__gte=dt).filter(timestamp_gte=df)
-#     serializer_class = PassesSerializer
-
-#  Passes.objects.filter(charge='2.8').filter(stationRef='KO01')
 
 class PassesPerStation(APIView):
     def get_object(self, pk, df, dt):
@@ -285,12 +241,11 @@ class resetpasses(APIView):
             for instance in Passes.objects.all().iterator():
                 instance.delete()
             return Response([{"status": "OK"}])
+        except BaseException as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+            return Response([{"status": "failed", "error type": str(err)}])
         except:
             return Response([{"status": "failed"}])
-
-# Δεν δουλευει με απλο path το open για καποιο λογο
-# οποτε εβαλα το full path του δικου μου υπολογιστη
-# Δε θα σας δουλευει αν δεν αλλαξετε το path
 
 
 class resetstations(APIView):
