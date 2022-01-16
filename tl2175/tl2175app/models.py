@@ -55,7 +55,7 @@ class Vehicle(models.Model):
         return self.vehicleid
 
 class Passes(models.Model):
-    passid = models.CharField(max_length=20, null=True)  # primary
+    passid = models.CharField(max_length=20, null=True, unique=True)  # primary
     timestamp = models.DateTimeField()
     charge = models.DecimalField(max_digits=5, decimal_places=2)
     # stationRef = models.CharField(max_length=50)

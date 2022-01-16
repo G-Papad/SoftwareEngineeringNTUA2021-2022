@@ -11,7 +11,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from .serializers import *
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework import generics, status
 from django.http import Http404
 from rest_framework.views import APIView
 from datetime import datetime
@@ -19,7 +19,7 @@ from django.db.models import Sum
 from django.db import connection
 from django.db.utils import OperationalError
 import csv
-
+from django.core.exceptions import ValidationError, BadRequest
 
 def upload_from_xslx(request):
     if request.method == 'POST':
@@ -104,7 +104,7 @@ class PassesPerStation(APIView):
         try:
             return Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         except Passes.DoesNotExist:
-            raise Http404
+            raise BadRequest("Invalid Request")
 
     def get(self, request, pk, df, dt, format=None):
         passes = self.get_object(pk, df, dt)
@@ -138,7 +138,7 @@ class PassesAnalysis(APIView):
         try:
             return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__tagProviderAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         except Passes.DoesNotExist:
-            raise Http404
+            raise BadRequest("Invalid Request")
 
     def get(self, request, op1_ID, op2_ID, df, dt, format=None):
         passes = self.get_object(op1_ID, op2_ID, df, dt)
@@ -168,7 +168,7 @@ class PassesCost(APIView):
         try:
             return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         except Passes.DoesNotExist:
-            raise Http404
+            raise BadRequest("Invalid Request")
 
     def get(self, request, op1, op2, df, dt, format=None):
         passes = self.get_object(op1, op2, df, dt)
@@ -195,8 +195,8 @@ class ChargesBy(APIView):
     def get_object(self, op1, op2, df, dt):
         try:
             return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        except Passes.DoesNotExist:
-            raise Http404
+        except:
+            raise BadRequest("Invalid Request")
 
     def get(self, request, op1, df, dt, format=None):
         response = [{"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
@@ -218,13 +218,35 @@ class PassesUpdate(APIView):
         serializer = PassesSerializerAll(snippets, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = PassesSerializerAll(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format="json"):
+        if format == "json":
+            for data in request.data: 
+                value = Passes()
+                value.passid = data["passid"]
+                value.timestamp = data["timestamp"]
+                value.charge = data["charge"]
+                value.passes_fk1 = Station.objects.get(stationid = data["stationRef"])
+                value.passes_fk2 = Vehicle.objects.get(vehicleid = data["vehicleRef"])
 
+                try:
+                    value.full_clean()
+                except ValidationError:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                value.save()
+            return Response([{"status": "OK"}])
+        
+        if format == "csv":
+            uploaded_file = request.data
+            imported_data = dataset.load(uploaded_file.read(), format='cvs')
+            for datasheet in imported_data.sheets():
+                for data in datasheet:
+                    value = Passes()
+                    value.passid = data[0]
+                    value.timestamp = data[1]
+                    value.charge = data[4]
+                    value.passes_fk1 = Station.objects.get(stationid=data[2])
+                    value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
+                    value.save()
 
 class healthcheck(APIView):
     def get(self, request):
