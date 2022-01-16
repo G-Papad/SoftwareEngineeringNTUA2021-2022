@@ -136,7 +136,7 @@ class PassesPerStation(APIView):
 class PassesAnalysis(APIView):
     def get_object(self, op1_ID, op2_ID, df, dt):
         try:
-            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__tagProviderAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         except Passes.DoesNotExist:
             raise BadRequest("Invalid Request")
 
@@ -166,7 +166,7 @@ class PassesAnalysis(APIView):
 class PassesCost(APIView):
     def get_object(self, op1, op2, df, dt):
         try:
-            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         except Passes.DoesNotExist:
             raise BadRequest("Invalid Request")
 

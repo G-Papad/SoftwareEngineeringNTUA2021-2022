@@ -22,4 +22,4 @@ urlpatterns = [
     path('admin/resetvehicles', views.resetvehicles.as_view()),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'csv'])
