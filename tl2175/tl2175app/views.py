@@ -1,3 +1,4 @@
+import io
 from django.shortcuts import render
 from .models import Vehicle, Passes, Station, Provider
 #from django.forms import MemberForm
@@ -19,7 +20,9 @@ from django.db.models import Sum
 from django.db import connection
 from django.db.utils import OperationalError
 import csv
+from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
+
 
 def upload_from_xslx(request):
     if request.method == 'POST':
@@ -173,22 +176,15 @@ class PassesCost(APIView):
     def get(self, request, op1, op2, df, dt, format=None):
         passes = self.get_object(op1, op2, df, dt)
         provider = Provider.objects.filter(providerAbbr=op1)
-        # serializer = PassesSerializer(passes, many=True)
-        serializer = ProviderSerializer(provider, many=True)
-        for data in serializer.data:
-            data["Operator1"] = op1
-            data["Operator2"] = op2
-            data["RequestTimestamp"] = datetime.now().strftime(
-                "%Y-%m-%d %H:%M:%S")
-            data["PeriodFrom"] = df
-            data["PeriodTo"] = dt
-            data["NumberOfPasses"] = passes.count()
-            data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
-            data.pop("providerAbbr")
-            data.pop("providerName")
-            data.pop("iban")
-            data.pop("bankname")
-        return Response(serializer.data)
+        data = {}
+        data["Operator1"] = op1
+        data["Operator2"] = op2
+        data["RequestTimestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data["PeriodFrom"] = df
+        data["PeriodTo"] = dt
+        data["NumberOfPasses"] = passes.count()
+        data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
+        return Response([data])
 
 
 class ChargesBy(APIView):
@@ -213,20 +209,23 @@ class ChargesBy(APIView):
 
 
 class PassesUpdate(APIView):
-    def get(self, request):
+    def get(self, request, format=None):
         snippets = Passes.objects.all()
         serializer = PassesSerializerAll(snippets, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format="json"):
+    def post(self, request, format='json'):
+        print(format)
         if format == "json":
-            for data in request.data: 
+            for data in request.data:
                 value = Passes()
-                value.passid = data["passid"]
+                value.passid = data["passID"]
                 value.timestamp = data["timestamp"]
                 value.charge = data["charge"]
-                value.passes_fk1 = Station.objects.get(stationid = data["stationRef"])
-                value.passes_fk2 = Vehicle.objects.get(vehicleid = data["vehicleRef"])
+                value.passes_fk1 = Station.objects.get(
+                    stationid=data["stationRef"])
+                value.passes_fk2 = Vehicle.objects.get(
+                    vehicleid=data["vehicleRef"])
 
                 try:
                     value.full_clean()
@@ -234,19 +233,33 @@ class PassesUpdate(APIView):
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 value.save()
             return Response([{"status": "OK"}])
-        
+
         if format == "csv":
-            uploaded_file = request.data
-            imported_data = dataset.load(uploaded_file.read(), format='cvs')
-            for datasheet in imported_data.sheets():
-                for data in datasheet:
-                    value = Passes()
-                    value.passid = data[0]
-                    value.timestamp = data[1]
-                    value.charge = data[4]
-                    value.passes_fk1 = Station.objects.get(stationid=data[2])
-                    value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
-                    value.save()
+            dataset = Dataset()
+            csv_file = request.FILES['file']
+            csvreader = csv.reader(io.StringIO(
+                csv_file.read().decode('utf-8')), delimiter=';')
+            header = next(csvreader)
+            # imported_data = dataset.load(io.StringIO(
+            #     csv_file.read().decode('utf-8')), 'csv')
+            # print(imported_data)
+            for data in csvreader:
+                if data[0] == None:
+                    break
+                value = Passes()
+                value.passid = data[0]
+                value.timestamp = datetime.strptime(
+                    data[1], "%d/%m/%Y %H:%M")
+                value.charge = data[4]
+                value.passes_fk1 = Station.objects.get(stationid=data[2])
+                value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
+                try:
+                    value.full_clean()
+                except ValidationError:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                value.save()
+            return Response([{"status": "OK"}])
+
 
 class healthcheck(APIView):
     def get(self, request):
