@@ -2,13 +2,10 @@ import io
 from django.shortcuts import render
 from .models import Vehicle, Passes, Station, Provider
 #from django.forms import MemberForm
-
-# Create your views here.
-
 from .resources import StationResource
 from django.contrib import messages
 from tablib import Dataset, Databook
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpRequest
 from rest_framework.parsers import JSONParser
 from .serializers import *
 from rest_framework.response import Response
@@ -109,7 +106,11 @@ class PassesPerStation(APIView):
         except Passes.DoesNotExist:
             raise BadRequest("Invalid Request")
 
-    def get(self, request, pk, df, dt, format=None):
+    def get(self, request, pk, df, dt):
+        try:
+            format = request.GET['format']
+        except:
+            format = 'json'
         passes = self.get_object(pk, df, dt)
         serializer = PassesSerializer(passes, many=True)
         header = {}
@@ -132,10 +133,12 @@ class PassesPerStation(APIView):
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
-            header["PassesList"].append(data)
+            if format=='json':
+                header["PassesList"].append(data)
 
-
-        return Response(header)
+        if format=='json' :
+            return Response(header)
+        return Response(serializer.data)
 
 
 class PassesAnalysis(APIView):
