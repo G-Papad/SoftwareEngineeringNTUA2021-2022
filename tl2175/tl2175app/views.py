@@ -148,7 +148,11 @@ class PassesAnalysis(APIView):
         except Passes.DoesNotExist:
             raise BadRequest("Invalid Request")
 
-    def get(self, request, op1_ID, op2_ID, df, dt, format=None):
+    def get(self, request, op1_ID, op2_ID, df, dt):
+        try:
+                format = request.GET['format']
+        except:
+                format = 'json'
         passes = self.get_object(op1_ID, op2_ID, df, dt)
         serializer = PassesSerializer(passes, many=True)
         augmented_serializer_data = list(serializer.data)
@@ -168,7 +172,11 @@ class PassesAnalysis(APIView):
             index += 1
             data["PassIndex"] = index
             data.pop("pass_type")
-            info["PassesList"].append(data)
+            if format=='json':
+                info["PassesList"].append(data)
+
+        if format == 'json':
+            return Response(info)
         return Response(info)
 
 
@@ -179,7 +187,11 @@ class PassesCost(APIView):
         except Passes.DoesNotExist:
             raise BadRequest("Invalid Request")
 
-    def get(self, request, op1, op2, df, dt, format=None):
+    def get(self, request, op1, op2, df, dt):
+        try:
+            format = request.GET['format']
+        except:
+            format = 'json'
         passes = self.get_object(op1, op2, df, dt)
         provider = Provider.objects.filter(providerAbbr=op1)
         data = {}
@@ -200,7 +212,11 @@ class ChargesBy(APIView):
         except:
             raise BadRequest("Invalid Request")
 
-    def get(self, request, op1, df, dt, format=None):
+    def get(self, request, op1, df, dt):
+        try:
+            format = request.GET['format']
+        except:
+            format = 'json'
         response = {"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
                      "PeriodTo": dt, "PPOList": []}
         for provider in Provider.objects.all():
@@ -211,17 +227,23 @@ class ChargesBy(APIView):
             dict = {"VisitingOperator": op2, "NumberOfPasses": passes.count(
             ), "PassesCost": passes.aggregate(Sum('charge'))["charge__sum"]}
             response["PPOList"].append(dict)
-        return Response(response)
+        if format=='json':
+            return Response(response)
+        return Response(response["PPOList"])
+
 
 
 class PassesUpdate(APIView):
-    def get(self, request, format=None):
-        snippets = Passes.objects.all()
-        serializer = PassesSerializerAll(snippets, many=True)
-        return Response(serializer.data)
+    # def get(self, request, format=None):
+    #     snippets = Passes.objects.all()
+    #     serializer = PassesSerializerAll(snippets, many=True)
+    #     return Response(serializer.data)
 
-    def post(self, request, format='json'):
-        print(format)
+    def post(self, request):
+        try:
+            format = request.GET['format']
+        except:
+            format = 'json'
         if format == "json":
             for data in request.data:
                 value = Passes()
