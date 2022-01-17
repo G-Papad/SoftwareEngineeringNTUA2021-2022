@@ -121,9 +121,9 @@ class PassesPerStation(APIView):
         header["PeriodFrom"] = df
         header["PeriodTo"] = dt
         header["NumberOfPasses"] = passes.count()
-
-        augmented_serializer_data = list(serializer.data)
-        augmented_serializer_data.insert(0, header)
+        header["PassesList"] = []
+        #augmented_serializer_data = list(serializer.data)
+        #augmented_serializer_data.insert(0, header)
         index = 0
         for data in serializer.data:
             index += 1
@@ -132,8 +132,10 @@ class PassesPerStation(APIView):
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
+            header["PassesList"].append(data)
 
-        return Response(augmented_serializer_data)
+
+        return Response(header)
 
 
 class PassesAnalysis(APIView):
@@ -156,14 +158,15 @@ class PassesAnalysis(APIView):
         info["PeriodFrom"] = df
         info["PeriodTo"] = dt
         info["NumberOfPasses"] = passes.count()
-        augmented_serializer_data.insert(0, info)
+        info["PassesList"] = []
+        #augmented_serializer_data.insert(0, info)
         index = 0
         for data in serializer.data:
             index += 1
             data["PassIndex"] = index
             data.pop("pass_type")
-
-        return Response(augmented_serializer_data)
+            info["PassesList"].append(data)
+        return Response(info)
 
 
 class PassesCost(APIView):
@@ -184,19 +187,19 @@ class PassesCost(APIView):
         data["PeriodTo"] = dt
         data["NumberOfPasses"] = passes.count()
         data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
-        return Response([data])
+        return Response(data)
 
 
 class ChargesBy(APIView):
     def get_object(self, op1, op2, df, dt):
         try:
-            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__tagProviderAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         except:
             raise BadRequest("Invalid Request")
 
     def get(self, request, op1, df, dt, format=None):
-        response = [{"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
-                     "PeriodTo": dt}]
+        response = {"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
+                     "PeriodTo": dt, "PPOList": []}
         for provider in Provider.objects.all():
             op2 = provider.providerAbbr
             if op2 == op1:
@@ -204,7 +207,7 @@ class ChargesBy(APIView):
             passes = self.get_object(op1, op2, df, dt)
             dict = {"VisitingOperator": op2, "NumberOfPasses": passes.count(
             ), "PassesCost": passes.aggregate(Sum('charge'))["charge__sum"]}
-            response.append(dict)
+            response["PPOList"].append(dict)
         return Response(response)
 
 
