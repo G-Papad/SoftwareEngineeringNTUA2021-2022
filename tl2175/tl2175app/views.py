@@ -133,10 +133,10 @@ class PassesPerStation(APIView):
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
-            if format=='json':
+            if format == 'json':
                 header["PassesList"].append(data)
 
-        if format=='json' :
+        if format == 'json':
             return Response(header)
         return Response(serializer.data)
 
@@ -150,9 +150,9 @@ class PassesAnalysis(APIView):
 
     def get(self, request, op1_ID, op2_ID, df, dt):
         try:
-                format = request.GET['format']
+            format = request.GET['format']
         except:
-                format = 'json'
+            format = 'json'
         passes = self.get_object(op1_ID, op2_ID, df, dt)
         serializer = PassesSerializer(passes, many=True)
         augmented_serializer_data = list(serializer.data)
@@ -172,12 +172,11 @@ class PassesAnalysis(APIView):
             index += 1
             data["PassIndex"] = index
             data.pop("pass_type")
-            if format=='json':
-                info["PassesList"].append(data)
+            info["PassesList"].append(data)
 
-        if format == 'json':
-            return Response(info)
-        return Response(info)
+        if (format == 'json'):
+            return Response(info, content_type='json')
+        return Response(info["PassesList"])
 
 
 class PassesCost(APIView):
@@ -218,7 +217,7 @@ class ChargesBy(APIView):
         except:
             format = 'json'
         response = {"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
-                     "PeriodTo": dt, "PPOList": []}
+                    "PeriodTo": dt, "PPOList": []}
         for provider in Provider.objects.all():
             op2 = provider.providerAbbr
             if op2 == op1:
@@ -227,10 +226,9 @@ class ChargesBy(APIView):
             dict = {"VisitingOperator": op2, "NumberOfPasses": passes.count(
             ), "PassesCost": passes.aggregate(Sum('charge'))["charge__sum"]}
             response["PPOList"].append(dict)
-        if format=='json':
+        if format == 'json':
             return Response(response)
         return Response(response["PPOList"])
-
 
 
 class PassesUpdate(APIView):
