@@ -115,7 +115,10 @@ class PassesPerStation(APIView):
         serializer = PassesSerializer(passes, many=True)
         header = {}
         header["Station"] = pk
-        station = passes[0].passes_fk1
+        try:
+            station = passes[0].passes_fk1
+        except:
+            raise BadRequest("Invalid Request")
         header["StationOperator"] = station.stationProvider
         header["RequestTimeStamp"] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S")
