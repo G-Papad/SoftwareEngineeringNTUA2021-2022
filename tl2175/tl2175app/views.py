@@ -100,28 +100,37 @@ def index(request):
 
 
 class PassesPerStation(APIView):
+    def check(self, pk):
+        station=Station.objects.filter(stationid=pk)
+        if(not station.exists()):
+            raise BadRequest("Invalid arguments")
+        return station[0]
+
     def get_object(self, pk, df, dt):
-        try:
-            return Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        except Passes.DoesNotExist:
-            raise BadRequest("Invalid Request")
+        passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        if(passes.exists()):
+            return passes
+        return []
 
     def get(self, request, pk, df, dt):
         try:
             format = request.GET['format']
         except:
             format = 'json'
+        station = self.check(pk)
         passes = self.get_object(pk, df, dt)
         serializer = PassesSerializer(passes, many=True)
         header = {}
         header["Station"] = pk
-        station = passes[0].passes_fk1
         header["StationOperator"] = station.stationProvider
         header["RequestTimeStamp"] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S")
         header["PeriodFrom"] = df
         header["PeriodTo"] = dt
-        header["NumberOfPasses"] = passes.count()
+        try:
+            header["NumberOfPasses"] = passes.count()
+        except:
+            header["NumberOfPasses"] = 0
         header["PassesList"] = []
         #augmented_serializer_data = list(serializer.data)
         #augmented_serializer_data.insert(0, header)
@@ -142,6 +151,13 @@ class PassesPerStation(APIView):
 
 
 class PassesAnalysis(APIView):
+    def check(self, op1_ID, op2_ID):
+        provider1 = Provider.objects.filter(providerAbbr=op1_ID)
+        provider2 = Provider.objects.filter(providerAbbr=op1_I2)
+        if (not provider1.exists()) or (not provider2.exists()):
+            raise BadRequest("Invalid arguments")
+        return (provider1[0], provider2[0])
+
     def get_object(self, op1_ID, op2_ID, df, dt):
         try:
             return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
@@ -201,6 +217,10 @@ class ChargesBy(APIView):
             raise BadRequest("Invalid Request")
 
     def get(self, request, op1, df, dt, format=None):
+        try:
+            format = request.GET['format']
+        except:
+            format = 'json'
         response = {"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
                      "PeriodTo": dt, "PPOList": []}
         for provider in Provider.objects.all():
