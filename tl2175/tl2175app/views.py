@@ -108,9 +108,9 @@ class PassesPerStation(APIView):
 
     def get(self, request, pk, df, dt):
         try:
-            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+            dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
-            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+            df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
             raise BadRequest("Wrong DateTime Format")
@@ -160,9 +160,9 @@ class PassesAnalysis(APIView):
 
     def get(self, request, op1_ID, op2_ID, df, dt):
         try:
-            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+            dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
-            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+            df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
             raise BadRequest("Wrong DateTime Format")
@@ -205,9 +205,9 @@ class PassesCost(APIView):
 
     def get(self, request, op1, op2, df, dt):
         try:
-            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+            dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
-            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+            df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
             raise BadRequest("Wrong DateTime Format")
@@ -237,9 +237,9 @@ class ChargesBy(APIView):
 
     def get(self, request, op1, df, dt):
         try:
-            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+            dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
-            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+            df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
             raise BadRequest("Wrong DateTime Format")
