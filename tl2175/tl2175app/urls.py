@@ -1,11 +1,9 @@
-from django.urls import path
 from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
-
+from django.urls import path, include, re_path
 # URLConfiguration
 
 urlpatterns = [
-    path('', views.index, name='index'),
     path('upload/', views.upload_from_xslx, name='upload'),
     path('PassesPerStation/<str:pk>/<str:df>/<str:dt>/',
          views.PassesPerStation.as_view()),
