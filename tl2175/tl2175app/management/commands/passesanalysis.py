@@ -4,7 +4,6 @@ from django.db.models import Sum
 from datetime import datetime
 from tl2175app.serializers import *
 import csv
-
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--op1', type=str, help="Visited Station's Operator ID")
@@ -28,7 +27,8 @@ class Command(BaseCommand):
         if(df > dt):
             print("Invlide arguments: date_from > date_to")
             return
-
+        name_from = df
+        name_to = dt
         try:
             dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
@@ -41,6 +41,8 @@ class Command(BaseCommand):
         passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         serializer = PassesSerializer(passes, many=True)
         augmented_serializer_data = list(serializer.data)
+
+
 
         info = {}
         info["op1_ID"] = op1_ID
@@ -60,15 +62,15 @@ class Command(BaseCommand):
             index += 1
             data["PassIndex"] = index
             data.pop("pass_type")
-            if format=='json':
-                info["PassesList"].append(data)
+            info["PassesList"].append(data)
 
         if format == 'json':
             print(info)
         else:
-            # toCSV = info['PassesList']
-            # with open('passesanalysis', 'w', encoding = 'utf8', newline='') as output_file:
-            #     fc = csv.DictWriter(output_file, field=toCSV[1].keys())
-            #     fc.writeheader()
-            #     fc.writerows(toCSV)
-            print("FIX_CSV_FORMAT")
+            name = "tl2175app/management/commands/results/PassesAnalysis_" + op1_ID + "_" + op2_ID + "_" + name_from + "_" + name_to + ".csv"
+            keys = info["PassesList"][0].keys()
+            a_file = open(name, "w", newline='')
+            dict_writer=csv.DictWriter(a_file, keys)
+            dict_writer.writeheader()
+            dict_writer.writerows(info["PassesList"])
+            a_file.close()

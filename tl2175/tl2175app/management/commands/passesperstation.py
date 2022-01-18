@@ -3,6 +3,7 @@ from tl2175app.models import Vehicle, Passes, Station, Provider
 from django.db.models import Sum
 from datetime import datetime
 from tl2175app.serializers import *
+import csv
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -26,6 +27,8 @@ class Command(BaseCommand):
             return
 
         station=station[0]
+        name_from = df
+        name_to = dt
 
         try:
             dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
@@ -35,6 +38,8 @@ class Command(BaseCommand):
         except:
             print("Wrong DateTime Format")
             return
+
+
 
         passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         if not passes.exists():
@@ -62,10 +67,15 @@ class Command(BaseCommand):
             data["PassIndex"] = index
             data["TagProvider"] = Vehicle_tagProvider
             data.pop("stationRef")
-            if format == 'json':
-                header["PassesList"].append(data)
+            header["PassesList"].append(data)
 
         if format == 'json':
             print(header)
         else:
-            print("FIX_CSV_FORMAT")
+            name = "tl2175app/management/commands/results/PassesPerStation_" + pk + "_" + name_from + "_" + name_to + ".csv"
+            keys = header["PassesList"][0].keys()
+            a_file = open(name, "w", newline='')
+            dict_writer=csv.DictWriter(a_file, keys)
+            dict_writer.writeheader()
+            dict_writer.writerows(header["PassesList"])
+            a_file.close()
