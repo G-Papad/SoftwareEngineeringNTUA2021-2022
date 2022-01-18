@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
+    "django_extensions",
+    'sslserver',
 ]
 
 REST_FRAMEWORK = {
@@ -110,6 +112,11 @@ AUTH_PASSWORD_VALIDATORS = [
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
             },
         ]
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

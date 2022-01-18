@@ -108,6 +108,13 @@ class PassesPerStation(APIView):
 
     def get(self, request, pk, df, dt):
         try:
+            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+        except:
+            raise BadRequest("Wrong DateTime Format")
+        try:
             format = request.GET['format']
         except:
             format = 'json'
@@ -153,6 +160,13 @@ class PassesAnalysis(APIView):
 
     def get(self, request, op1_ID, op2_ID, df, dt):
         try:
+            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+        except:
+            raise BadRequest("Wrong DateTime Format")
+        try:
             format = request.GET['format']
         except:
             format = 'json'
@@ -191,6 +205,13 @@ class PassesCost(APIView):
 
     def get(self, request, op1, op2, df, dt):
         try:
+            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+        except:
+            raise BadRequest("Wrong DateTime Format")
+        try:
             format = request.GET['format']
         except:
             format = 'json'
@@ -215,6 +236,13 @@ class ChargesBy(APIView):
             raise BadRequest("Invalid Request")
 
     def get(self, request, op1, df, dt):
+        try:
+            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+        except:
+            raise BadRequest("Wrong DateTime Format")
         try:
             format = request.GET['format']
         except:
