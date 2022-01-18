@@ -6,41 +6,53 @@ from tl2175app.serializers import *
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('--station', type=str, help="Visited Station's Operator ID")
+        parser.add_argument('--station', type=str, help="Passthrough Station ID")
         parser.add_argument('--datefrom', type=str, default = "2005-01-01 00:00:00", help="Date From")
         parser.add_argument('--dateto', type=str, default = "2021-01-01 00:00:00", help='Date To')
-        parser.add_argument('--format', type=str, choices=['json', 'csv'], default = 'json', help='Data Format',)
+        parser.add_argument('--format', type=str, choices=['json', 'csv'], default = 'json', help='Data Format')
 
     def handle(self, *args, **options):
-        op1_ID = options['op1']
-        op2_ID = options['op2']
+        pk = options['station']
         df = options['datefrom']
         dt = options['dateto']
         format = options['format']
 
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID)#.exclude(timestamp__gte=df).filter(timestamp__gte=dt)
-        serializer = PassesSerializer(passes, many=True)
-        augmented_serializer_data = list(serializer.data)
+        try:
+            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+                "%Y-%m-%d %H:%M:%S")
+        except:
+            print("Wrong DateTime Format")
 
-        info = {}
-        info["op1_ID"] = op1_ID
-        info["op2_ID"] = op2_ID
-        info["RequestTimeStamp"] = datetime.now().strftime(
+
+        passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        serializer = PassesSerializer(passes, many=True)
+        header = {}
+        header["Station"] = pk
+        try:
+            station = passes[0].passes_fk1
+        except:
+            print("Invalid Request")
+        header["StationOperator"] = station.stationProvider
+        header["RequestTimeStamp"] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S")
-        info["PeriodFrom"] = df
-        info["PeriodTo"] = dt
-        info["NumberOfPasses"] = passes.count()
-        info["PassesList"] = []
-        #augmented_serializer_data.insert(0, info)
+        header["PeriodFrom"] = df
+        header["PeriodTo"] = dt
+        header["NumberOfPasses"] = passes.count()
+        header["PassesList"] = []
         index = 0
         for data in serializer.data:
             index += 1
+            Vehicle = passes[index-1].passes_fk2
+            Vehicle_tagProvider = Vehicle.tagProvider
             data["PassIndex"] = index
-            data.pop("pass_type")
-            if format=='json':
-                info["PassesList"].append(data)
+            data["TagProvider"] = Vehicle_tagProvider
+            data.pop("stationRef")
+            if format == 'json':
+                header["PassesList"].append(data)
 
         if format == 'json':
-            print(info)
+            print(header)
         else:
-            print ("FIX_FOR_CSV")
+            print("FIX_CSV_FORMAT")

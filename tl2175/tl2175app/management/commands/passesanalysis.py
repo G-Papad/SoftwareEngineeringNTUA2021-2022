@@ -19,7 +19,7 @@ class Command(BaseCommand):
         dt = options['dateto']
         format = options['format']
 
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=df).filter(timestamp__gte=dt)
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         serializer = PassesSerializer(passes, many=True)
         augmented_serializer_data = list(serializer.data)
 
