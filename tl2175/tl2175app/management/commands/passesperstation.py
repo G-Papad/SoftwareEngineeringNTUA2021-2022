@@ -7,8 +7,8 @@ from tl2175app.serializers import *
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--station', type=str, help="Passthrough Station ID")
-        parser.add_argument('--datefrom', type=str, default = "2005-01-01 00:00:00", help="Date From")
-        parser.add_argument('--dateto', type=str, default = "2021-01-01 00:00:00", help='Date To')
+        parser.add_argument('--datefrom', type=str, default = "20210128", help="Date From")
+        parser.add_argument('--dateto', type=str, default = "20210201", help='Date To')
         parser.add_argument('--format', type=str, choices=['json', 'csv'], default = 'json', help='Data Format')
 
     def handle(self, *args, **options):
@@ -17,29 +17,42 @@ class Command(BaseCommand):
         dt = options['dateto']
         format = options['format']
 
+        station=Station.objects.filter(stationid=pk)
+        if not station.exists():
+            print("Invalid arguments: Station does not exist")
+            return
+        if(df>dt):
+            print("Invalid arguments: date_from > date_to")
+            return
+
+        station=station[0]
+
         try:
-            dt = datetime.strptime(dt, "%Y%m%d%H%M%S").strftime(
+            dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
-            df = datetime.strptime(df, "%Y%m%d%H%M%S").strftime(
+            df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
             print("Wrong DateTime Format")
-
+            return
 
         passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        if not passes.exists():
+            passes = []
         serializer = PassesSerializer(passes, many=True)
+
         header = {}
         header["Station"] = pk
-        try:
-            station = passes[0].passes_fk1
-        except:
-            print("Invalid Request")
         header["StationOperator"] = station.stationProvider
         header["RequestTimeStamp"] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S")
         header["PeriodFrom"] = df
         header["PeriodTo"] = dt
-        header["NumberOfPasses"] = passes.count()
+        try:
+            header["NumberOfPasses"] = passes.count()
+        except:
+            header["NumberOfPasses"] = 0
+
         header["PassesList"] = []
         index = 0
         for data in serializer.data:

@@ -105,7 +105,7 @@ class PassesPerStation(APIView):
         if not station.exists():
             raise BadRequest("Invalid arguments: Provider does not exist")
         if(df > dt):
-            raise BadRequest("Invlide arguments: date_from > date_to")
+            raise BadRequest("Invalid arguments: date_from > date_to")
         return station[0]
 
     def get_object(self, pk, df, dt):
@@ -130,7 +130,7 @@ class PassesPerStation(APIView):
         passes = self.get_object(pk, df, dt)
         serializer = PassesSerializer(passes, many=True)
         header = {}
-        header["Station"] = pk        
+        header["Station"] = pk
         header["StationOperator"] = station.stationProvider
         header["RequestTimeStamp"] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S")
