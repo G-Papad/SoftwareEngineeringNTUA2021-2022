@@ -100,10 +100,12 @@ def index(request):
 
 
 class PassesPerStation(APIView):
-    def check(self, pk):
+    def check(self, pk, df, dt):
         station=Station.objects.filter(stationid=pk)
-        if(not station.exists()):
-            raise BadRequest("Invalid arguments")
+        if not station.exists():
+            raise BadRequest("Invalid arguments: Provider does not exist")
+        if(df > dt):
+            raise BadRequest("Invlide arguments: date_from > date_to")
         return station[0]
 
     def get_object(self, pk, df, dt):
@@ -124,15 +126,11 @@ class PassesPerStation(APIView):
             format = request.GET['format']
         except:
             format = 'json'
-        station = self.check(pk)
+        station = self.check(pk,df,dt)
         passes = self.get_object(pk, df, dt)
         serializer = PassesSerializer(passes, many=True)
         header = {}
-        header["Station"] = pk
-        try:
-            station = passes[0].passes_fk1
-        except:
-            raise BadRequest("Invalid Request")
+        header["Station"] = pk        
         header["StationOperator"] = station.stationProvider
         header["RequestTimeStamp"] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S")
@@ -162,18 +160,20 @@ class PassesPerStation(APIView):
 
 
 class PassesAnalysis(APIView):
-    def check(self, op1_ID, op2_ID):
+    def check(self, op1_ID, op2_ID, df, dt):
         provider1 = Provider.objects.filter(providerAbbr=op1_ID)
-        provider2 = Provider.objects.filter(providerAbbr=op1_I2)
+        provider2 = Provider.objects.filter(providerAbbr=op2_ID)
         if (not provider1.exists()) or (not provider2.exists()):
-            raise BadRequest("Invalid arguments")
+            raise BadRequest("Invalid arguments: Provider does not exist")
+        if(df > dt):
+            raise BadRequest("Invlide arguments: date_from > date_to")
         return (provider1[0], provider2[0])
 
     def get_object(self, op1_ID, op2_ID, df, dt):
-        try:
-            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        except Passes.DoesNotExist:
-            raise BadRequest("Invalid Request")
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        if(passes.exists()):
+            return passes
+        return []
 
     def get(self, request, op1_ID, op2_ID, df, dt):
         try:
@@ -187,6 +187,7 @@ class PassesAnalysis(APIView):
             format = request.GET['format']
         except:
             format = 'json'
+        self.check(op1_ID, op2_ID, df, dt)
         passes = self.get_object(op1_ID, op2_ID, df, dt)
         serializer = PassesSerializer(passes, many=True)
         augmented_serializer_data = list(serializer.data)
@@ -198,7 +199,10 @@ class PassesAnalysis(APIView):
             "%Y-%m-%d %H:%M:%S")
         info["PeriodFrom"] = df
         info["PeriodTo"] = dt
-        info["NumberOfPasses"] = passes.count()
+        try:
+            info["NumberOfPasses"] = passes.count()
+        except:
+            info["NumberOfPasses"] = 0
         info["PassesList"] = []
         #augmented_serializer_data.insert(0, info)
         index = 0
@@ -214,11 +218,20 @@ class PassesAnalysis(APIView):
 
 
 class PassesCost(APIView):
+    def check(self, op1_ID, op2_ID, df, dt):
+        provider1 = Provider.objects.filter(providerAbbr=op1_ID)
+        provider2 = Provider.objects.filter(providerAbbr=op2_ID)
+        if (not provider1.exists()) or (not provider2.exists()):
+            raise BadRequest("Invalid arguments: Provider does not exist")
+        if(df > dt):
+            raise BadRequest("Invlide arguments: date_from > date_to")
+        return provider1[0]
+
     def get_object(self, op1, op2, df, dt):
-        try:
-            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        except Passes.DoesNotExist:
-            raise BadRequest("Invalid Request")
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        if(passes.exists()):
+            return passes
+        return []
 
     def get(self, request, op1, op2, df, dt):
         try:
@@ -232,25 +245,37 @@ class PassesCost(APIView):
             format = request.GET['format']
         except:
             format = 'json'
+        provider = self.check(op1, op2, df, dt)
         passes = self.get_object(op1, op2, df, dt)
-        provider = Provider.objects.filter(providerAbbr=op1)
         data = {}
         data["Operator1"] = op1
         data["Operator2"] = op2
         data["RequestTimestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data["PeriodFrom"] = df
         data["PeriodTo"] = dt
-        data["NumberOfPasses"] = passes.count()
-        data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
+        try:
+            data["NumberOfPasses"] = passes.count()
+            data["PassesCost"] = passes.aggregate(Sum('charge'))["charge__sum"]
+        except:
+            data["NumberOfPasses"] = 0
+            data["PassesCost"] = 0
         return Response(data)
 
 
 class ChargesBy(APIView):
+    def check(self, op1_ID, df, dt):
+        provider1 = Provider.objects.filter(providerAbbr=op1_ID)
+        if (not provider1.exists()):
+            raise BadRequest("Invalid arguments: Provider does not exist")
+        if(df > dt):
+            raise BadRequest("Invlide arguments: date_from > date_to")
+        return provider1[0]
+
     def get_object(self, op1, op2, df, dt):
-        try:
-            return Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        except:
-            raise BadRequest("Invalid Request")
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        if(passes.exists()):
+            return passes
+        return []
 
     def get(self, request, op1, df, dt):
         try:
@@ -264,6 +289,7 @@ class ChargesBy(APIView):
             format = request.GET['format']
         except:
             format = 'json'
+        self.check(op1,df,dt)
         response = {"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
                     "PeriodTo": dt, "PPOList": []}
         for provider in Provider.objects.all():
@@ -271,8 +297,13 @@ class ChargesBy(APIView):
             if op2 == op1:
                 continue
             passes = self.get_object(op1, op2, df, dt)
-            dict = {"VisitingOperator": op2, "NumberOfPasses": passes.count(
-            ), "PassesCost": passes.aggregate(Sum('charge'))["charge__sum"]}
+            try:
+                pcount = passes.count()
+                psum = passes.aggregate(Sum('charge'))["charge__sum"]
+            except:
+                pcount = 0
+                psum = 0
+            dict = {"VisitingOperator": op2, "NumberOfPasses": pcount, "PassesCost": psum}
             response["PPOList"].append(dict)
         if format == 'json':
             return Response(response)
