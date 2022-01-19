@@ -8,8 +8,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--op1', type=str, help="Visited Station's Operator ID")
         parser.add_argument('--op2', type=str, help="Visitor's Operator ID")
-        parser.add_argument('--datefrom', type=str, default = "2005-01-01 00:00:000[:00[.000000]][TZ]", help="Date From")
-        parser.add_argument('--dateto', type=str, default = "2021-01-01 00:00:000[:00[.000000]][TZ]", help='Date To')
+        parser.add_argument('--datefrom', type=str, default = "20050101", help="Date From")
+        parser.add_argument('--dateto', type=str, default = "20210101", help='Date To')
         parser.add_argument('--format', type=str, choices=['json', 'csv'], default = 'json', help='Data Format',)
 
     def handle(self, *args, **options):

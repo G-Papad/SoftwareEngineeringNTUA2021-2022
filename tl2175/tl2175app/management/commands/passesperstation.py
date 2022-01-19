@@ -8,8 +8,8 @@ import csv
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--station', type=str, help="Passthrough Station ID")
-        parser.add_argument('--datefrom', type=str, default = "20210128", help="Date From")
-        parser.add_argument('--dateto', type=str, default = "20210201", help='Date To')
+        parser.add_argument('--datefrom', type=str, default = "20050101", help="Date From")
+        parser.add_argument('--dateto', type=str, default = "20210101", help='Date To')
         parser.add_argument('--format', type=str, choices=['json', 'csv'], default = 'json', help='Data Format')
 
     def handle(self, *args, **options):
