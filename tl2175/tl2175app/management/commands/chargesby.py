@@ -3,7 +3,7 @@ from tl2175app.models import Vehicle, Passes, Station, Provider
 from django.db.models import Sum
 from datetime import datetime
 from tl2175app.serializers import *
-import csv
+import csv, json
 
 
 
@@ -13,12 +13,14 @@ class Command(BaseCommand):
         parser.add_argument('--datefrom', type=str, default = "20050101", help="Date From")
         parser.add_argument('--dateto', type=str, default = "20210101", help='Date To')
         parser.add_argument('--format', type=str, choices=['json', 'csv'], default = 'json', help='Data Format',)
+        parser.add_argument('--savejson', type=str, choices=['yes', 'no'], default = 'no', help='Would you like to write JSON data to a file?')
 
     def handle(self, *args, **options):
         op1 = options['op1']
         df = options['datefrom']
         dt = options['dateto']
         format = options['format']
+        savejson = options['savejson']
 
         provider1 = Provider.objects.filter(providerAbbr=op1)
         if (not provider1.exists()):
@@ -62,8 +64,14 @@ class Command(BaseCommand):
 
         if format == 'json':
             print(response)
+            """
+            name1 = "tl2175app/management/commands/results/json/ChargesBy_" + op1 + "_" + name_from + "_" + name_to + ".json"
+            if savejson == 'yes':
+                with open(name1, 'w') as f:
+                    json.dump(response, f)
+            """
         else:
-            name = "tl2175app/management/commands/results/ChargesBy_" + op1 + "_"  + name_from + "_" + name_to + ".csv"
+            name = "tl2175app/management/commands/results/csv/ChargesBy_" + op1 + "_"  + name_from + "_" + name_to + ".csv"
             keys = response["PPOList"][0].keys()
             a_file = open(name, "w", newline='')
             dict_writer=csv.DictWriter(a_file, keys)
