@@ -3,9 +3,11 @@ from tl2175app.models import Vehicle, Passes, Station, Provider
 from django.db.models import Sum
 from datetime import datetime
 from tl2175app.serializers import *
-import csv, json
+import csv, json, os
+import requests
 
 class Command(BaseCommand):
+
     def add_arguments(self, parser):
         parser.add_argument('--op1', type=str, help="Visited Station's Operator ID")
         parser.add_argument('--op2', type=str, help="Visitor's Operator ID")
@@ -41,46 +43,30 @@ class Command(BaseCommand):
             print("Wrong DateTime Format")
             return
 
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        serializer = PassesSerializer(passes, many=True)
-        augmented_serializer_data = list(serializer.data)
-
-
-
-        info = {}
-        info["op1_ID"] = op1_ID
-        info["op2_ID"] = op2_ID
-        info["RequestTimeStamp"] = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S")
-        info["PeriodFrom"] = df
-        info["PeriodTo"] = dt
-        try:
-            info["NumberOfPasses"] = passes.count()
-        except:
-            info["NumberOfPasses"] = 0
-
-        info["PassesList"] = []
-        index = 0
-        for data in serializer.data:
-            index += 1
-            data["PassIndex"] = index
-            data.pop("pass_type")
-            info["PassesList"].append(data)
-
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + op1_ID + '/' + op2_ID + '/' + name_from + '/' + name_to
+        passes = requests.get(url).json()
+#savedata
         if format == 'json':
-            print(info)
+            print(passes)
             name1 = "tl2175app/management/commands/results/json/PassesAnalysis_" + op1_ID + "_" + op2_ID + "_" + name_from + "_" + name_to + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:
-                    json.dump(info, f)
+                    json.dump(passes, f)
         else:
             name = "tl2175app/management/commands/results/csv/PassesAnalysis_" + op1_ID + "_" + op2_ID + "_" + name_from + "_" + name_to + ".csv"
-            a_file = open(name, "w", newline='')
-            if info['PassesList']==[]:
-                dict_writer=csv.DictWriter(a_file)
+            data_file = open(name, 'w', newline = '')
+            data = passes['PassesList']
+            if data == []:
+                keys = ['passid', 'timestamp', 'charge', 'stationRef', 'vehicleRef', 'PassIndex']
+                csv_writer=csv.DictWriter(data_file, keys)
             else:
-                keys = info["PassesList"][0].keys()
-                dict_writer=csv.DictWriter(a_file, keys)
-            dict_writer.writeheader()
-            dict_writer.writerows(info["PassesList"])
-            a_file.close()
+                keys = data[0].keys()
+                csv_writer = csv.DictWriter(data_file, keys)
+            csv_writer.writeheader()
+            count = 0
+            for i in data:
+                if count == 0:
+                    csv_writer.writerow
+                    count +=1
+                csv_writer.writerow(i)
+            data_file.close()

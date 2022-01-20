@@ -4,6 +4,7 @@ from django.db.models import Sum
 from datetime import datetime
 from tl2175app.serializers import *
 import csv, json
+import requests
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -42,34 +43,8 @@ class Command(BaseCommand):
             return
 
 
-
-        passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        if not passes.exists():
-            passes = []
-        serializer = PassesSerializer(passes, many=True)
-
-        header = {}
-        header["Station"] = pk
-        header["StationOperator"] = station.stationProvider
-        header["RequestTimeStamp"] = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S")
-        header["PeriodFrom"] = df
-        header["PeriodTo"] = dt
-        try:
-            header["NumberOfPasses"] = passes.count()
-        except:
-            header["NumberOfPasses"] = 0
-
-        header["PassesList"] = []
-        index = 0
-        for data in serializer.data:
-            index += 1
-            Vehicle = passes[index-1].passes_fk2
-            Vehicle_tagProvider = Vehicle.tagProvider
-            data["PassIndex"] = index
-            data["TagProvider"] = Vehicle_tagProvider
-            data.pop("stationRef")
-            header["PassesList"].append(data)
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesPerStation/' + pk + '/'  + name_from + '/' + name_to
+        header = requests.get(url).json()
 
         if format == 'json':
             print(header)
@@ -78,13 +53,20 @@ class Command(BaseCommand):
                 with open(name1, 'w') as f:
                     json.dump(header, f)
         else:
-            name = "tl2175app/management/commands/results/json/PassesPerStation_" + pk + "_" + name_from + "_" + name_to + ".csv"
-            a_file = open(name, "w", newline='')
-            if header['PassesList']==[]:
-                dict_writer=csv.DictWriter(a_file)
+            name = "tl2175app/management/commands/results/csv/PassesPerStation_" + pk + "_" + name_from + "_" + name_to + ".csv"
+            data_file = open(name, "w", newline='')
+            data = header['PassesList']
+            if data==[]:
+                keys = ['passid', 'timestamp', 'charge', 'vehicleRef', 'pass_type', 'PassIndex', 'TagProvider']
+                csv_writer=csv.DictWriter(data_file, keys)
             else:
-                keys = header["PassesList"][0].keys()
-                dict_writer=csv.DictWriter(a_file, keys)
-            dict_writer.writeheader()
-            dict_writer.writerows(header["PassesList"])
-            a_file.close()
+                keys = data[0].keys()
+                csv_writer=csv.DictWriter(data_file, keys)
+            csv_writer.writeheader()
+            count = 0
+            for i in data:
+                if count == 0:
+                    csv_writer.writerow
+                    count += 1
+                csv_writer.writerow(i)
+            data_file.close()

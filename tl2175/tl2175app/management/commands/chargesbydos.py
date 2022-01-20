@@ -4,6 +4,7 @@ from django.db.models import Sum
 from datetime import datetime
 from tl2175app.serializers import *
 import csv, json
+import requests
 
 
 
@@ -39,42 +40,32 @@ class Command(BaseCommand):
         except:
             print("Wrong DateTime Format")
             return
-        response = {}
-        response["op1ID"] = op1
-        response["RequestTimeStamp"] = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S")
-        response["PeriodFrom"] = df
-        response["PeriodTo"] = dt
-        response["PPOList"] = []
-        for provider in Provider.objects.all():
-            op2 = provider.providerAbbr
-            if op2 == op1:
-                continue
-            passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-            try:
-                pcount = passes.count()
-                psum = passes.aggregate(Sum('charge'))["charge__sum"]
-            except:
-                #psum = 0
-                pcount = 0
-            if (psum == None):
-                psum = 0
-            dict = {"VisitingOperator": op2, "NumberOfPasses": pcount, "PassesCost": psum}
-            response["PPOList"].append(dict)
+
+        url = 'http://127.0.0.1:8000/interoperability/api/ChargesBy/' + op1 + '/' + name_from + '/' + name_to
+        response = requests.get(url).json()
 
         if format == 'json':
             print(response)
-            """
             name1 = "tl2175app/management/commands/results/json/ChargesBy_" + op1 + "_" + name_from + "_" + name_to + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:
                     json.dump(response, f)
-            """
+
         else:
             name = "tl2175app/management/commands/results/csv/ChargesBy_" + op1 + "_"  + name_from + "_" + name_to + ".csv"
-            keys = response["PPOList"][0].keys()
-            a_file = open(name, "w", newline='')
-            dict_writer=csv.DictWriter(a_file, keys)
-            dict_writer.writeheader()
-            dict_writer.writerows(response["PPOList"])
-            a_file.close()
+            data_file = open(name, 'w', newline = '')
+            data = response['PPOList']
+            if data == []:
+                keys = ['VisitingOperator', 'NumberOfPasses', 'PassesCost']
+                csv_writer = csv.DictWriter(data_file, keys)
+            else:
+                keys = data[0].keys()
+                csv_writer = csv.DictWriter(data_file, keys)
+            csv_writer.writeheader()
+            count = 0
+            for i in data:
+                if count == 0:
+                    csv_writer.writerow
+                    count +=1
+                csv_writer.writerow(i)
+            data_file.close()
