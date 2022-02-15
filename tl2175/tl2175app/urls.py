@@ -18,6 +18,7 @@ urlpatterns = [
     path('admin/resetpasses', views.resetpasses.as_view()),
     path('admin/resetstations', views.resetstations.as_view()),
     path('admin/resetvehicles', views.resetvehicles.as_view()),
+    path('transauth', views.transauth, name='transauth'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'csv'])

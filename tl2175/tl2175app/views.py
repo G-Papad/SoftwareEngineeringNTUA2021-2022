@@ -20,7 +20,6 @@ import csv
 from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
 
-
 def upload_from_xslx(request):
     if request.method == 'POST':
         # station_resource = StationResource()
@@ -85,6 +84,14 @@ def upload_from_xslx(request):
 
     return render(request, 'upload.html')
 
+def transauth(request):
+    operator = Provider.objects.all()
+    name = request.POST.get('name')
+    print(name)
+    print("hey")
+
+
+    return render(request, 'transauth.html', {'operators': operator})
 
 def index(request):
     vehicles = Vehicle.objects.all()

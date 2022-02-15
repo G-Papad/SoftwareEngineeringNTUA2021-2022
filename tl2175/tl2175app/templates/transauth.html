@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Transportation Authorities</title>
+  </head>
+  <body>
+    <h1>Passes Analysis for Transportation Authorities</h1>
+    <form name="protos" method = "post">
+      {%csrf_token%}
+      <label for='op1'>Choose first operator</label>
+      <select name="op1">
+        {%for operator in operators %}
+        <option value="{{operator}}">{{operator}}</option>
+        {%endfor%}
+      </select>
+      <input type = "submit">
+    </form>
+    <form>
+      <label for='op2'>Choose second operator</label>
+      <select name="op2">
+        {%for operator in operators %}
+        <option value="{{operator}}">{{operator}}</option>
+        {%endfor%}
+      </select>
+      <input type = "submit">
+    </form>
+    <form>
+      <label> Choose start date
+        <input type="date" name="Date From" min="2000-01-01" max="2021-01-01">
+      </label>
+    </form>
+    <form>
+      <label> Choose end date
+        <input type="date" name="Date From" min="2000-01-01" max="2021-01-01">
+      </label>
+    </form>
+    <form>
+      <label for='Diagram Type'>Choose diagram type</label>
+      <select name="Diagram Type" id="Diagram Type">
+        <option value = "Plot1">Plot1</option>
+        <option value = "Plot2">Plot2</option>
+      </select>
+      <input type = "submit">
+    </form>
+  </body>
+</html>
