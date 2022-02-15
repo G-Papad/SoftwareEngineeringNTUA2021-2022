@@ -1,36 +1,45 @@
 <!DOCTYPE html>
+
+{% load static %}
+
 <html>
   <head>
     <title>Transportation Authorities</title>
+    <link rel ="stylesheet" type="text/css" href="{% static 'transauth_style.css' %}">
   </head>
   <body>
     <h1>Passes Analysis for Transportation Authorities</h1>
     <form name="trans_form" method = "post">
       {%csrf_token%}
-      <label for='op1'>Choose first operator</label>
+      <div class="tr_form">
+      <label for='op1'>Choose first operator
       <select name="op1">
         {%for operator in operators %}
-        <option value="{{operator}}">{{operator}}</option>
+        <option value="{{operator.providerAbbr}}">{{operator}}</option>
         {%endfor%}
       </select>
-      <label for='op2'>Choose second operator</label>
+      </label>
+      <label for='op2'>Choose second operator
       <select name="op2">
         {%for operator in operators %}
-        <option value="{{operator}}">{{operator}}</option>
+        <option value="{{operator.providerAbbr}}">{{operator}}</option>
         {%endfor%}
       </select>
+    </label>
       <label> Choose start date
         <input type="date" name="DateFrom" min="2000-01-01" max="2021-01-01">
       </label>
       <label> Choose end date
         <input type="date" name="DateTo" min="2000-01-01" max="2021-01-01">
       </label>
-      <label for='Diagram Type'>Choose diagram type</label>
+      <label for='Diagram Type'>Choose diagram type
       <select name="Diagram Type" id="Diagram Type">
         <option value = "Plot1">Plot1</option>
         <option value = "Plot2">Plot2</option>
       </select>
+      </label>
       <input type = "submit">
+    </div>
     </form>
   </body>
 </html>

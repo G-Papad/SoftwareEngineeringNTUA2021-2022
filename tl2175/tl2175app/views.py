@@ -88,9 +88,14 @@ def transauth(request):
     operator = Provider.objects.all()
     if request.method == 'POST':
         form = request.POST
+        dt = form["DateTo"]
+        df = form["DateFrom"]
         print(form)
-        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + form["op1"] + '/' + form["op2"] + '/' + form["DateFrom"] + '/' + form["DateTo"]
-        #passes = requests.get(url).json()
+        dt = datetime.strptime(dt, "%Y-%m-%d").strftime("%Y%m%d")
+        df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
+        passes = requests.get(url).json()
+        print(passes)
     return render(request, 'transauth.html', {'operators': operator})
 
 def index(request):
