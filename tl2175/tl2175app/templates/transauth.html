@@ -6,21 +6,24 @@
   <head>
     <title>Transportation Authorities</title>
     <link rel ="stylesheet" type="text/css" href="{% static 'transauth_style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   </head>
   <body>
     <h1>Passes Analysis for Transportation Authorities</h1>
     <form name="trans_form" method = "post">
       {%csrf_token%}
       <div class="tr_form">
-      <label for='op1'>Choose first operator
-      <select name="op1">
-        {%for operator in operators %}
-        <option value="{{operator.providerAbbr}}">{{operator}}</option>
-        {%endfor%}
-      </select>
-      </label>
+      <div class="form-floating mb-3">
+        <select class="form-select" name="op1">
+          <option selected></option> 
+          {%for operator in operators %}
+          <option value="{{operator.providerAbbr}}">{{operator}}</option>
+          {%endfor%}
+        </select>
+        <label for='op1'>Choose first operator</label>
+      </div>
       <label for='op2'>Choose second operator
-      <select name="op2">
+      <select class="form-select" name="op2">
         {%for operator in operators %}
         <option value="{{operator.providerAbbr}}">{{operator}}</option>
         {%endfor%}
@@ -33,12 +36,13 @@
         <input type="date" name="DateTo" min="2000-01-01" max="2021-01-01">
       </label>
       <label for='Diagram Type'>Choose diagram type
-      <select name="Diagram Type" id="Diagram Type">
+      <select class="form-select" name="Diagram Type" id="Diagram Type">
         <option value = "Plot1">Plot1</option>
         <option value = "Plot2">Plot2</option>
       </select>
       </label>
-      <input type = "submit">
+      <br>
+      <input type = "submit" class="submit-button">
     </div>
     </form>
   </body>
