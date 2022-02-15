@@ -9,6 +9,7 @@ urlpatterns = [
          views.PassesPerStation.as_view()),
     path('PassesAnalysis/<str:op1_ID>/<str:op2_ID>/<str:df>/<str:dt>/',
          views.PassesAnalysis.as_view()),
+    path('PassesCost/', views.passescost, name='passescost'),
     path('PassesCost/<str:op1>/<str:op2>/<str:df>/<str:dt>/',
          views.PassesCost.as_view()),
     path('ChargesBy/<str:op1>/<str:df>/<str:dt>/',

@@ -16,9 +16,11 @@ from datetime import datetime
 from django.db.models import Sum
 from django.db import connection
 from django.db.utils import OperationalError
-import csv, requests
+import csv
+import requests
 from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
+
 
 def upload_from_xslx(request):
     if request.method == 'POST':
@@ -84,6 +86,7 @@ def upload_from_xslx(request):
 
     return render(request, 'upload.html')
 
+
 def transauth(request):
     operator = Provider.objects.all()
     if request.method == 'POST':
@@ -93,27 +96,47 @@ def transauth(request):
         print(form)
         dt = datetime.strptime(dt, "%Y-%m-%d").strftime("%Y%m%d")
         df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
-        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + \
+            form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         passes = requests.get(url).json()
         print(passes)
     return render(request, 'transauth.html', {'operators': operator})
 
-def index(request):
-    vehicles = Vehicle.objects.all()
-    passes = Passes.objects.all()
-    stations = Station.objects.all()
-    providers = Provider.objects.all()
 
-    return render(request, 'index.html', {
-        'vehicles': vehicles,
-        'passes': passes,
-        'stations': stations,
-        'providers': providers})
+def passescost(request):
+
+    def get_object(op1, op2, df, dt):
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(
+            passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        if(passes.exists()):
+            return passes
+        return []
+    if request.method == "POST":
+        form = request.POST
+        op1 = form["op1"]
+        op2 = form["op2"]
+        df = form["DateFrom"] + " 00:00:00"
+        dt = form["DateTo"] + " 00:00:00"
+        passes = get_object(op1, op2, df, dt)
+        data = []
+        data.append(op1)
+        data.append(op2)
+        data.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        data.append(df)
+        data.append(dt)
+        data.append(passes.count())
+        data.append(str(passes.aggregate(Sum('charge'))["charge__sum"]))
+        print(data)
+        return render(request, 'passescostres.html', {'res': data})
+    else:
+        res = []
+        operator = Provider.objects.all()
+        return render(request, 'passescost.html', {'operators': operator, 'res': res})
 
 
 class PassesPerStation(APIView):
     def check(self, pk, df, dt):
-        station=Station.objects.filter(stationid=pk)
+        station = Station.objects.filter(stationid=pk)
         if not station.exists():
             raise BadRequest("Invalid arguments: Provider does not exist")
         if(df > dt):
@@ -121,7 +144,8 @@ class PassesPerStation(APIView):
         return station[0]
 
     def get_object(self, pk, df, dt):
-        passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        passes = Passes.objects.filter(passes_fk1__stationid=pk).exclude(
+            timestamp__gte=dt).filter(timestamp__gte=df)
         if(passes.exists()):
             return passes
         return []
@@ -138,7 +162,7 @@ class PassesPerStation(APIView):
             format = request.GET['format']
         except:
             format = 'json'
-        station = self.check(pk,df,dt)
+        station = self.check(pk, df, dt)
         passes = self.get_object(pk, df, dt)
         serializer = PassesSerializer(passes, many=True)
         header = {}
@@ -182,7 +206,8 @@ class PassesAnalysis(APIView):
         return (provider1[0], provider2[0])
 
     def get_object(self, op1_ID, op2_ID, df, dt):
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1_ID).filter(
+            passes_fk2__vehicle_fk1__providerAbbr=op2_ID).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         if(passes.exists()):
             return passes
         return []
@@ -240,7 +265,8 @@ class PassesCost(APIView):
         return provider1[0]
 
     def get_object(self, op1, op2, df, dt):
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(
+            passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         if(passes.exists()):
             return passes
         return []
@@ -284,7 +310,8 @@ class ChargesBy(APIView):
         return provider1[0]
 
     def get_object(self, op1, op2, df, dt):
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
+        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(
+            passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         if(passes.exists()):
             return passes
         return []
@@ -301,7 +328,7 @@ class ChargesBy(APIView):
             format = request.GET['format']
         except:
             format = 'json'
-        self.check(op1,df,dt)
+        self.check(op1, df, dt)
         response = {"opID": op1, "RequestTimeStamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "PeriodFrom": df,
                     "PeriodTo": dt, "PPOList": []}
         for provider in Provider.objects.all():
@@ -315,7 +342,8 @@ class ChargesBy(APIView):
             except:
                 pcount = 0
                 psum = 0
-            dict = {"VisitingOperator": op2, "NumberOfPasses": pcount, "PassesCost": psum}
+            dict = {"VisitingOperator": op2,
+                    "NumberOfPasses": pcount, "PassesCost": psum}
             response["PPOList"].append(dict)
         if format == 'json':
             return Response(response)
