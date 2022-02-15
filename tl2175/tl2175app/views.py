@@ -16,7 +16,7 @@ from datetime import datetime
 from django.db.models import Sum
 from django.db import connection
 from django.db.utils import OperationalError
-import csv
+import csv, requests
 from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
 
@@ -86,11 +86,11 @@ def upload_from_xslx(request):
 
 def transauth(request):
     operator = Provider.objects.all()
-    name = request.POST.get('name')
-    print(name)
-    print("hey")
-
-
+    if request.method == 'POST':
+        form = request.POST
+        print(form)
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + form["op1"] + '/' + form["op2"] + '/' + form["DateFrom"] + '/' + form["DateTo"]
+        #passes = requests.get(url).json()
     return render(request, 'transauth.html', {'operators': operator})
 
 def index(request):
