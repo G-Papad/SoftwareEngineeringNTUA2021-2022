@@ -88,8 +88,11 @@ def upload_from_xslx(request):
     return render(request, 'upload.html')
 
 def mainpage(request):
-    
+
     return render(request, 'mainpage.html')
+
+def info(request):
+    return render(request, 'info.html')
 
 def transauth(request):
     operator = Provider.objects.all()
