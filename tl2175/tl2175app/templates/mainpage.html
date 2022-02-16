@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% load static %}
+
+{% block content %}
+<html>
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
+  <title>Transportation Authorities</title>
+  <link rel ="stylesheet" type="text/css" href="{% static 'mainpage_style.css' %}">
+</head>
+<body>
+  <div class="header">
+    <h1> ConnectWays </h1>
+    <p> Welcome! </p>
+    <button class="button-17" role="button" onclick ="window.location.href='/interoperability/api/mainpage'">Home Page</button>
+    <button class="button-17" role="button" onclick ="window.location.href='/interoperability/api/transauth'">Passes Analysis</button>
+    <button class="button-17" role="button" onclick ="window.location.href='/interoperability/api/PassesCost/'">Passes Cost</button>
+    <button class="button-17" role="button" onclick ="window.location.href='/interoperability/api/info'">Info</button>
+  </div>
+
+</body>
+</html>
+{% endblock %}
