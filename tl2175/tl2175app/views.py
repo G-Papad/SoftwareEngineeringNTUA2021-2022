@@ -20,7 +20,8 @@ import csv
 import requests
 from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
-
+import plotly.graph_objects as go
+import plotly as px
 
 def upload_from_xslx(request):
     if request.method == 'POST':
@@ -100,7 +101,22 @@ def transauth(request):
             form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         passes = requests.get(url).json()
         print(passes)
+        data = passes['PassesList']
+        x = []
+        y = []
+        count = 0
+        for i in data:
+            #print(i['PassIndex'])
+            x.append(i['PassIndex'])
+            y.append(i['timestamp'])
+            #new_data = {'NumberOfPasses': i['PassIndex'], 'Date': i['timestamp']}
+        dataset = go.Scatter(x = x, y = y)
+        layout = go.Layout(xaxis=dict(title='Date'), yaxis=dict(title='Number Of Passes'))
+        fig = go.Figure(data=dataset, layout=layout)
+        #plotly.offline.plot(fig,filename='positives.html',config={'displayModeBar': False})
+        #fig.write_image("imaegs/fig1.png")
     return render(request, 'transauth.html', {'operators': operator})
+
 
 
 def passescost(request):

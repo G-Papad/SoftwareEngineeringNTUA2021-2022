@@ -10,7 +10,7 @@
   </head>
   <body>
     <h1>Passes Analysis for Transportation Authorities</h1>
-    
+
     <form name="trans_form" method = "post">
       {%csrf_token%}
       <div class="tr_form">
@@ -18,7 +18,7 @@
         <div class="operator-container">
           <div class="form-floating mb-3">
             <select class="form-select" name="op1">
-              <option selected></option> 
+              <option selected></option>
               {%for operator in operators %}
               <option value="{{operator.providerAbbr}}">{{operator}}</option>
               {%endfor%}
@@ -28,7 +28,7 @@
 
           <div class="form-floating mb-3 ">
             <select class="form-select" name="op2">
-              <option selected></option> 
+              <option selected></option>
               {%for operator in operators %}
               <option value="{{operator.providerAbbr}}">{{operator}}</option>
               {%endfor%}
@@ -51,19 +51,22 @@
         <br>
 
         <h6>Choose Plot Type</h6>
-        <div class="form-floating mb-3">   
+        <div class="form-floating mb-3">
           <select class="form-select" name="Diagram Type" id="Diagram Type">
-            <option selected></option> 
+            <option selected></option>
             <option value = "Plot1">Plot1</option>
             <option value = "Plot2">Plot2</option>
           </select>
           <label for='Diagram Type'>Diagram Type</label>
-        </div> 
+        </div>
       <br>
       <div class="submit-container">
         <input type = "submit" class="submit-button">
       </div>
     </div>
     </form>
+    <div style="width:1000;height:100">
+    {{ graph_div|safe }}
+    </div>
   </body>
 </html>
