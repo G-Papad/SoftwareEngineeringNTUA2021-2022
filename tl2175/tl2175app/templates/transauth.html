@@ -10,39 +10,59 @@
   </head>
   <body>
     <h1>Passes Analysis for Transportation Authorities</h1>
+    
     <form name="trans_form" method = "post">
       {%csrf_token%}
       <div class="tr_form">
-      <div class="form-floating mb-3">
-        <select class="form-select" name="op1">
-          <option selected></option> 
-          {%for operator in operators %}
-          <option value="{{operator.providerAbbr}}">{{operator}}</option>
-          {%endfor%}
-        </select>
-        <label for='op1'>Choose first operator</label>
-      </div>
-      <label for='op2'>Choose second operator
-      <select class="form-select" name="op2">
-        {%for operator in operators %}
-        <option value="{{operator.providerAbbr}}">{{operator}}</option>
-        {%endfor%}
-      </select>
-    </label>
-      <label> Choose start date
-        <input type="date" name="DateFrom" min="2000-01-01" max="2021-01-01">
-      </label>
-      <label> Choose end date
-        <input type="date" name="DateTo" min="2000-01-01" max="2021-01-01">
-      </label>
-      <label for='Diagram Type'>Choose diagram type
-      <select class="form-select" name="Diagram Type" id="Diagram Type">
-        <option value = "Plot1">Plot1</option>
-        <option value = "Plot2">Plot2</option>
-      </select>
-      </label>
+        <h6>Choose operators</h6>
+        <div class="operator-container">
+          <div class="form-floating mb-3">
+            <select class="form-select" name="op1">
+              <option selected></option> 
+              {%for operator in operators %}
+              <option value="{{operator.providerAbbr}}">{{operator}}</option>
+              {%endfor%}
+            </select>
+            <label for='op1'>Home</label>
+          </div>
+
+          <div class="form-floating mb-3 ">
+            <select class="form-select" name="op2">
+              <option selected></option> 
+              {%for operator in operators %}
+              <option value="{{operator.providerAbbr}}">{{operator}}</option>
+              {%endfor%}
+            </select>
+            <label for='op2'>Away</label>
+          </div>
+        </div>
+
+        <h6>Choose Dates</h6>
+        <div class="Dates-container">
+          <div class="Date-container">
+            <label>Start Date</label>
+            <input type="date" name="DateFrom" min="2000-01-01" max="2021-01-01" class="button">
+          </div>
+          <div class="Date-container">
+            <label>End Date</label>
+            <input type="date" name="DateTo" min="2000-01-01" max="2021-01-01" class="button">
+          </div>
+        </div>
+        <br>
+
+        <h6>Choose Plot Type</h6>
+        <div class="form-floating mb-3">   
+          <select class="form-select" name="Diagram Type" id="Diagram Type">
+            <option selected></option> 
+            <option value = "Plot1">Plot1</option>
+            <option value = "Plot2">Plot2</option>
+          </select>
+          <label for='Diagram Type'>Diagram Type</label>
+        </div> 
       <br>
-      <input type = "submit" class="submit-button">
+      <div class="submit-container">
+        <input type = "submit" class="submit-button">
+      </div>
     </div>
     </form>
   </body>
