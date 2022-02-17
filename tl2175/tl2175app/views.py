@@ -119,45 +119,27 @@ def transauth(request):
             x.append(i['PassIndex'])
             y.append(i['timestamp'])
             #new_data = {'NumberOfPasses': i['PassIndex'], 'Date': i['timestamp']}
-        dataset = go.Scatter(x = x, y = y)
-        layout = go.Layout(xaxis=dict(title='Date'), yaxis=dict(title='Number Of Passes'))
-        fig = go.Figure(data=dataset, layout=layout)
+        #dataset = go.Scatter(x = x, y = y)
+        #layout = go.Layout(xaxis=dict(title='Date'), yaxis=dict(title='Number Of Passes'))
+        #fig = go.Figure(data=dataset, layout=layout)
         #plotly.offline.plot(fig,filename='positives.html',config={'displayModeBar': False})
         #fig.write_image("imaegs/fig1.png")
     return render(request, 'transauth.html', {'operators': operator})
 
-
-
 def passescost(request):
-
-    def get_object(op1, op2, df, dt):
-        passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(
-            passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
-        if(passes.exists()):
-            return passes
-        return []
-    if request.method == "POST":
+    operator = Provider.objects.all()
+    if request.method == 'POST':
         form = request.POST
-        op1 = form["op1"]
-        op2 = form["op2"]
-        df = form["DateFrom"] + " 00:00:00"
-        dt = form["DateTo"] + " 00:00:00"
-        passes = get_object(op1, op2, df, dt)
-        data = []
-        data.append(op1)
-        data.append(op2)
-        data.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        data.append(df)
-        data.append(dt)
-        data.append(passes.count())
-        data.append(str(passes.aggregate(Sum('charge'))["charge__sum"]))
-        print(data)
-        return render(request, 'passescostres.html', {'res': data})
-    else:
-        res = []
-        operator = Provider.objects.all()
-        return render(request, 'passescost.html', {'operators': operator, 'res': res})
-
+        dt = form["DateTo"]
+        df = form["DateFrom"]
+        print(form)
+        dt = datetime.strptime(dt, "%Y-%m-%d").strftime("%Y%m%d")
+        df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
+        data = requests.get(url).json()
+        print(data) 
+        return render(request, 'passescostres.html', {'res': data.values()})
+    return render(request, 'passescost.html', {'operators': operator})
 
 class PassesPerStation(APIView):
     def check(self, pk, df, dt):
@@ -500,3 +482,35 @@ class resetvehicles(APIView):
             return Response([{"status": "failed", "error type": str(err)}])
         except:
             return Response([{"status": "failed"}])
+
+
+class configurePayments(APIView):
+    def check(self, op1, op2, df, dt):
+        provider1 = Provider.objects.filter(providerAbbr=op1)
+        provider2 = Provider.objects.filter(providerAbbr=op2)
+        if (not provider1.exists()) or (not provider2.exists()):
+            raise BadRequest("Invalid arguments: Provider does not exist")
+        if(df > dt):
+            raise BadRequest("Invlide arguments: date_from > date_to")
+        return (provider1[0], provider2[0])
+
+    def get(self, request, op1, op2, df, dt):
+        try:
+            format = request.GET['format']
+        except:
+            format = 'json'
+        self.check(op1, op2, df, dt)
+
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op1 + '/' + op2 + '/' + df + '/' + dt
+        print(requests.get(url))
+        cost_op1 = (requests.get(url).json())['PassesCost']
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op2 + '/' + op1 + '/' + df + '/' + dt
+        cost_op2 = (requests.get(url).json())["PassesCost"]
+
+        final_cost = cost_op1 - cost_op2
+        res ={}
+        res["operators"] = op1 + " " + op2
+        res["cost"] = final_cost
+        if(format == 'json'):
+            return Response(res, content_type='json')
+        return Response(res)

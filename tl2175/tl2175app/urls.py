@@ -23,6 +23,7 @@ urlpatterns = [
     path('mainpage', views.mainpage, name = 'mainpage'),
     path('info', views.info, name='info'),
     path('passupdt/', views.passupdt, name='passupdt'),
+    path('configurePayments/<str:op1>/<str:op2>/<str:df>/<str:dt>/', views.configurePayments.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'csv'])
