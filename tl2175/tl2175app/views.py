@@ -496,20 +496,14 @@ class configurePayments(APIView):
 
     def get(self, request, op1, op2, df, dt):
         try:
-            dt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
-                "%Y-%m-%d %H:%M:%S")
-            df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
-                "%Y-%m-%d %H:%M:%S")
-        except:
-            raise BadRequest("Wrong DateTime Format")
-        try:
             format = request.GET['format']
         except:
             format = 'json'
         self.check(op1, op2, df, dt)
 
         url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op1 + '/' + op2 + '/' + df + '/' + dt
-        cost_op1 = (requests.get(url).json())["PassesCost"]
+        print(requests.get(url))
+        cost_op1 = (requests.get(url).json())['PassesCost']
         url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op2 + '/' + op1 + '/' + df + '/' + dt
         cost_op2 = (requests.get(url).json())["PassesCost"]
 
