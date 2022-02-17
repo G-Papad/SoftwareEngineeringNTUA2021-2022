@@ -137,7 +137,7 @@ def passescost(request):
         df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
         url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         data = requests.get(url).json()
-        print(data) 
+        print(data)
         return render(request, 'passescostres.html', {'res': data.values()})
     return render(request, 'passescost.html', {'operators': operator})
 
