@@ -6,8 +6,6 @@ from tl2175app.serializers import *
 import csv, json
 import requests
 
-
-
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--op1', type=str, help="Visited Station's Operator ID")

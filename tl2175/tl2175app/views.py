@@ -365,10 +365,11 @@ class PassesUpdate(APIView):
           return Response(serializer.data)
     """
     def post(self, request):
-        try:
-            format = request.GET['format']
-        except:
-            format = 'json'
+        # try:
+        #     format = request.GET['format']
+        # except:
+        #     format = 'json'
+        format = request.GET['format']
         if format == "json":
             for data in request.data:
                 value = Passes()
@@ -418,7 +419,7 @@ class healthcheck(APIView):
     def get(self, request):
         try:
             connection.ensure_connection()
-            return Response([{"status": "OK", "dbconnection": "connectionstring"}])
+            return Response([{"status": "OK", "dbconnection": "Connected"}])
         except OperationalError:
             return Response([{"status": "failed"}])
 
