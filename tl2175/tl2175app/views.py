@@ -94,6 +94,9 @@ def mainpage(request):
 def info(request):
     return render(request, 'info.html')
 
+def passupdt(request):
+    return(render(request, 'passupdt.html'))
+
 def transauth(request):
     operator = Provider.objects.all()
     if request.method == 'POST':
@@ -373,11 +376,12 @@ class ChargesBy(APIView):
 
 
 class PassesUpdate(APIView):
-    # def get(self, request, format=None):
-    #     snippets = Passes.objects.all()
-    #     serializer = PassesSerializerAll(snippets, many=True)
-    #     return Response(serializer.data)
-
+    """
+    def get(self, request, format=None):
+          snippets = Passes.objects.all()
+          serializer = PassesSerializerAll(snippets, many=True)
+          return Response(serializer.data)
+    """
     def post(self, request):
         # try:
         #     format = request.GET['format']

@@ -22,6 +22,7 @@ urlpatterns = [
     path('transauth', views.transauth, name='transauth'),
     path('mainpage', views.mainpage, name = 'mainpage'),
     path('info', views.info, name='info'),
+    path('passupdt/', views.passupdt, name='passupdt'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'csv'])
