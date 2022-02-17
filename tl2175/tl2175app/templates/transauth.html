@@ -1,7 +1,5 @@
-<!DOCTYPE html>
 
 {% load static %}
-
 <html>
   <head>
     <title>Transportation Authorities</title>
@@ -11,7 +9,6 @@
   <body>
     {%include "base.html"%}
     <h3>Passes Analysis for Transportation Authorities</h3>
-
     <form name="trans_form" method = "post">
       {%csrf_token%}
       <div class="tr_form">
@@ -66,8 +63,8 @@
       </div>
     </div>
     </form>
-    <div style="width:1000;height:100">
+    <!-- <div style="width:1000;height:100">
     {{ graph_div|safe }}
-    </div>
+    </div> -->
   </body>
 </html>
