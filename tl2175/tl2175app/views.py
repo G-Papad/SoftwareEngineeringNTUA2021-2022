@@ -276,7 +276,7 @@ class PassesCost(APIView):
         if (not provider1.exists()) or (not provider2.exists()):
             raise BadRequest("Invalid arguments: Provider does not exist")
         if(df > dt):
-            raise BadRequest("Invlide arguments: date_from > date_to")
+            raise BadRequest("Invalid arguments: date_from > date_to")
         return provider1[0]
 
     def get_object(self, op1, op2, df, dt):
