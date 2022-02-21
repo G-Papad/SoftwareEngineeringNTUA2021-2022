@@ -23,6 +23,7 @@ from django.core.exceptions import ValidationError, BadRequest
 #import plotly.graph_objects as go
 #import plotly as px
 
+
 def upload_from_xslx(request):
     if request.method == 'POST':
         # station_resource = StationResource()
@@ -87,15 +88,19 @@ def upload_from_xslx(request):
 
     return render(request, 'upload.html')
 
+
 def mainpage(request):
 
     return render(request, 'mainpage.html')
 
+
 def info(request):
     return render(request, 'info.html')
 
+
 def passupdt(request):
     return(render(request, 'passupdt.html'))
+
 
 def transauth(request):
     operator = Provider.objects.all()
@@ -126,6 +131,7 @@ def transauth(request):
         #fig.write_image("imaegs/fig1.png")
     return render(request, 'transauth.html', {'operators': operator})
 
+
 def passescost(request):
     operator = Provider.objects.all()
     if request.method == 'POST':
@@ -135,11 +141,13 @@ def passescost(request):
         print(form)
         dt = datetime.strptime(dt, "%Y-%m-%d").strftime("%Y%m%d")
         df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
-        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + \
+            form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         data = requests.get(url).json()
         print(data)
         return render(request, 'passescostres.html', {'res': data.values()})
     return render(request, 'passescost.html', {'operators': operator})
+
 
 class PassesPerStation(APIView):
     def check(self, pk, df, dt):
@@ -364,6 +372,7 @@ class PassesUpdate(APIView):
           serializer = PassesSerializerAll(snippets, many=True)
           return Response(serializer.data)
     """
+
     def post(self, request):
         # try:
         #     format = request.GET['format']
@@ -501,14 +510,16 @@ class configurePayments(APIView):
             format = 'json'
         self.check(op1, op2, df, dt)
 
-        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op1 + '/' + op2 + '/' + df + '/' + dt
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + \
+            op1 + '/' + op2 + '/' + df + '/' + dt
         print(requests.get(url))
         cost_op1 = (requests.get(url).json())['PassesCost']
-        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op2 + '/' + op1 + '/' + df + '/' + dt
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + \
+            op2 + '/' + op1 + '/' + df + '/' + dt
         cost_op2 = (requests.get(url).json())["PassesCost"]
 
         final_cost = cost_op1 - cost_op2
-        res ={}
+        res = {}
         res["operators"] = op1 + " " + op2
         res["cost"] = final_cost
         if(format == 'json'):
