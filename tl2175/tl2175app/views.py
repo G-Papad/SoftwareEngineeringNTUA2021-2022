@@ -153,7 +153,7 @@ class PassesPerStation(APIView):
     def check(self, pk, df, dt):
         station = Station.objects.filter(stationid=pk)
         if not station.exists():
-            raise BadRequest("Invalid arguments: Provider does not exist")
+            raise BadRequest("Invalid arguments: Station does not exist")
         if(df > dt):
             raise BadRequest("Invalid arguments: date_from > date_to")
         return station[0]
@@ -366,12 +366,11 @@ class ChargesBy(APIView):
 
 
 class PassesUpdate(APIView):
-    """
-    def get(self, request, format=None):
-          snippets = Passes.objects.all()
-          serializer = PassesSerializerAll(snippets, many=True)
-          return Response(serializer.data)
-    """
+
+    # def get(self, request, format=None):
+    #     snippets = Passes.objects.all()
+    #     serializer = PassesSerializerAll(snippets, many=True)
+    #     return Response(serializer.data)
 
     def post(self, request):
         # try:
@@ -381,20 +380,23 @@ class PassesUpdate(APIView):
         format = request.GET['format']
         if format == "json":
             for data in request.data:
-                value = Passes()
-                value.passid = data["passID"]
-                value.timestamp = data["timestamp"]
-                value.charge = data["charge"]
-                value.passes_fk1 = Station.objects.get(
-                    stationid=data["stationRef"])
-                value.passes_fk2 = Vehicle.objects.get(
-                    vehicleid=data["vehicleRef"])
-
                 try:
-                    value.full_clean()
-                except ValidationError:
-                    return Response(status=status.HTTP_400_BAD_REQUEST)
-                value.save()
+                    value = Passes()
+                    value.passid = data["passID"]
+                    value.timestamp = data["timestamp"]
+                    value.charge = data["charge"]
+                    value.passes_fk1 = Station.objects.get(
+                        stationid=data["stationRef"])
+                    value.passes_fk2 = Vehicle.objects.get(
+                        vehicleid=data["vehicleRef"])
+
+                    try:
+                        value.full_clean()
+                    except ValidationError:
+                        raise BadRequest("Error 400 - Bad Request")
+                    value.save()
+                except:
+                    raise BadRequest("Error 400 - Bad Request")
             return Response([{"status": "OK"}])
 
         if format == "csv":
@@ -407,20 +409,23 @@ class PassesUpdate(APIView):
             #     csv_file.read().decode('utf-8')), 'csv')
             # print(imported_data)
             for data in csvreader:
-                if data[0] == None:
-                    break
-                value = Passes()
-                value.passid = data[0]
-                value.timestamp = datetime.strptime(
-                    data[1], "%d/%m/%Y %H:%M")
-                value.charge = data[4]
-                value.passes_fk1 = Station.objects.get(stationid=data[2])
-                value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
                 try:
-                    value.full_clean()
-                except ValidationError:
-                    return Response(status=status.HTTP_400_BAD_REQUEST)
-                value.save()
+                    if data[0] == None:
+                        break
+                    value = Passes()
+                    value.passid = data[0]
+                    value.timestamp = datetime.strptime(
+                        data[1], "%d/%m/%Y %H:%M")
+                    value.charge = data[4]
+                    value.passes_fk1 = Station.objects.get(stationid=data[2])
+                    value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
+                    try:
+                        value.full_clean()
+                    except ValidationError:
+                        raise BadRequest("Error 400 - Bad Request")
+                    value.save()
+                except:
+                    raise BadRequest("Error 400 - Bad Request")
             return Response([{"status": "OK"}])
 
 
@@ -436,8 +441,10 @@ class healthcheck(APIView):
 class resetpasses(APIView):
     def post(self, request):
         try:
-            for instance in Passes.objects.all().iterator():
-                instance.delete()
+            # for instance in Passes.objects.all().iterator():
+            #     instance.delete()
+            objects_to_del = Passes.objects.all()
+            objects_to_del.delete()
             return Response([{"status": "OK"}])
         except BaseException as err:
             print(f"Unexpected {err=}, {type(err)=}")
