@@ -14,7 +14,7 @@ class Command(BaseCommand):
         url = 'http://127.0.0.1:8000/interoperability/api/admin/resetpasses'
         response = requests.post(url).json()
         if options['format'] == 'json':
-            print(response)
+            print(response, file = self.stdout)
         else:
             name = "tl2175app/management/commands/results/csv/resetpasses-" + str(date.today()) + ".csv"
             data_file = open(name, 'w', newline = '')
