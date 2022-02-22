@@ -366,19 +366,10 @@ class ChargesBy(APIView):
 
 
 class PassesUpdate(APIView):
-<<<<<<< HEAD
-
-    # def get(self, request, format=None):
-    #     snippets = Passes.objects.all()
-    #     serializer = PassesSerializerAll(snippets, many=True)
-    #     return Response(serializer.data)
-=======
     def get(self, request, format=None):
-          snippets = Passes.objects.all()
-          serializer = PassesSerializerAll(snippets, many=True)
-          return Response(serializer.data)
-
->>>>>>> 6f1baa35f2bfdd1f5ea7cbc37c28ea29f0d5bc84
+        snippets = Passes.objects.all()
+        serializer = PassesSerializerAll(snippets, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         try:
@@ -434,7 +425,7 @@ class PassesUpdate(APIView):
                 except:
                     raise BadRequest("Error 400 - Bad Request")
             return Response([{"status": "OK"}])
-        return Response([{"status":"Unsupported format method"}])
+        return Response([{"status": "Unsupported format method"}])
 
 
 class healthcheck(APIView):
