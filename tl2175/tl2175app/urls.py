@@ -6,7 +6,11 @@ from django.urls import path, include, re_path
 urlpatterns = [
     path('', views.mainpage, name='mainpage'),
     path('upload/', views.upload_from_xslx, name='upload'),
+<<<<<<< HEAD
     # path('PassesUpdate/', views.passupdt, name='passupdt'),
+=======
+    #path('PassesUpdate/', views.passupdt, name='passupdt'),
+>>>>>>> 6f1baa35f2bfdd1f5ea7cbc37c28ea29f0d5bc84
     path('PassesAnalysis', views.transauth, name='transauth'),
     path('PassesUpdate/', views.PassesUpdate.as_view()),
     path('PassesPerStation/<str:pk>/<str:df>/<str:dt>/',

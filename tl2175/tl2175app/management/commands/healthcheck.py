@@ -15,7 +15,7 @@ class Command(BaseCommand):
         response = requests.get(url).json()
 
         if options['format'] == 'json':
-            print(response)
+            print(response, file = self.stdout)
         else:
             name = "tl2175app/management/commands/results/csv/healthcheck-" + str(date.today()) + ".csv"
             data_file = open(name, 'w', newline = '')
