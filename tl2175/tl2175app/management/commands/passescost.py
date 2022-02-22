@@ -26,10 +26,10 @@ class Command(BaseCommand):
         provider1 = Provider.objects.filter(providerAbbr=op1)
         provider2 = Provider.objects.filter(providerAbbr=op2)
         if (not provider1.exists()) or (not provider2.exists()):
-            print("Invalid arguments: Provider does not exist")
+            print("Invalid arguments: Provider does not exist", file=self.stdout)
             return
         if(df > dt):
-            print("Invlide arguments: date_from > date_to")
+            print("Invlide arguments: date_from > date_to", file=self.stdout)
             return
         name_from = df
         name_to = dt
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + op1 + '/' + op2 + '/' + name_from + '/' + name_to
         response = requests.get(url).json()
         if format == 'json':
-            print(response)
+            print(response, file=self.stdout)
             name1 = "tl2175app/management/commands/results/json/PassesCost" + op1 + "_"  + op2 + '_' + name_from + "_" + name_to + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 csv_writer = csv.DictWriter(data_file, keys)
             else:
                 keys = data.keys()
-                print(keys)
+                print(keys, file=self.stdout)
                 csv_writer = csv.DictWriter(data_file, keys)
             csv_writer.writeheader()
             csv_writer.writerow(data)
