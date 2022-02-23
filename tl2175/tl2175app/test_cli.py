@@ -184,6 +184,10 @@ class SetUp(TestCase):
         text = self.do_command('configurepayments', op1 = 'KO', op2 = 'AO', datefrom = '20200320', dateto = '20200404')
         self.assertEqual("""{'operators': 'KO AO', 'cost': -13.8}\n\n""", text)
 
+    # def test_admin_passesupd(self):
+    #     text = self.do_command('admin', passesupd=True, source='testing_data/newpass.csv')
+        
+
 class HealthCheckTest(TestCase):
     def do_command(self, *args, **options):
         with StringIO() as f:
