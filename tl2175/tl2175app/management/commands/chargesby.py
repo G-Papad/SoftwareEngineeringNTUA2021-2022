@@ -22,12 +22,15 @@ class Command(BaseCommand):
         savejson = options['savejson']
 
         provider1 = Provider.objects.filter(providerAbbr=op1)
+
         if (not provider1.exists()):
-            print("Invalid arguments: Provider does not exist")
+            print("Invalid arguments: Provider does not exist", file = self.stdout)
             return
+        
         if(df > dt):
-            print("Invlide arguments: date_from > date_to")
+            print("Invalid arguments: date_from > date_to", file = self.stdout)
             return
+
         name_from = df
         name_to = dt
         try:
@@ -36,14 +39,14 @@ class Command(BaseCommand):
             df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
-            print("Wrong DateTime Format")
+            print("Wrong DateTime Format", file = self.stdout)
             return
 
         url = 'http://127.0.0.1:8000/interoperability/api/ChargesBy/' + op1 + '/' + name_from + '/' + name_to
         response = requests.get(url).json()
 
         if format == 'json':
-            print(response)
+            print(response, file = self.stdout)
             name1 = "tl2175app/management/commands/results/json/ChargesBy_" + op1 + "_" + name_from + "_" + name_to + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:

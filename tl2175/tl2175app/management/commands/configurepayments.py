@@ -25,11 +25,13 @@ class Command(BaseCommand):
 
         provider1 = Provider.objects.filter(providerAbbr=op1)
         provider2 = Provider.objects.filter(providerAbbr=op2)
+
         if (not provider1.exists()) or (not provider2.exists()):
-            print("Invalid arguments: Provider does not exist")
+            print("Invalid arguments: Provider does not exist", file = self.stdout)
             return
+        
         if(df > dt):
-            print("Invlide arguments: date_from > date_to")
+            print("Invalid arguments: date_from > date_to", file = self.stdout)
             return
         try:
             newdt = datetime.strptime(dt+"000000", "%Y%m%d%H%M%S").strftime(
@@ -37,21 +39,21 @@ class Command(BaseCommand):
             newdf = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
-            print("Wrong DateTime Format")
+            print("Wrong DateTime Format", file = self.stdout)
             return
         passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=newdt).filter(timestamp__gte=newdf)
         provider = Provider.objects.filter(providerAbbr=op1)
 
-        url = 'http://127.0.0.1:8000/interoperability/api/configurePayments/' + op1 + '/' + op2 + '/' + df + '/' + dt
+        url = 'http://127.0.0.1:8000/interoperability/api/ConfigurePayments/' + op1 + '/' + op2 + '/' + df + '/' + dt
         response = requests.get(url).json()
         if format == 'json':
-            print(response)
-            name1 = "tl2175app/management/commands/results/json/configurePayments" + op1 + "_"  + op2 + '_' + df + "_" + dt + ".json"
+            print(response, file = self.stdout)
+            name1 = "tl2175app/management/commands/results/json/ConfigurePayments_" + op1 + "_"  + op2 + '_' + df + "_" + dt + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:
                     json.dump(response, f)
         else:
-            name = "tl2175app/management/commands/results/csv/configurePayments" + op1 + "_" + op2 + '_' + df + "_" + dt + ".csv"
+            name = "tl2175app/management/commands/results/csv/ConfigurePayments_" + op1 + "_" + op2 + '_' + df + "_" + dt + ".csv"
             data_file = open(name, 'w', newline = '')
             data = response
             if data == []:
@@ -59,7 +61,7 @@ class Command(BaseCommand):
                 csv_writer = csv.DictWriter(data_file, keys)
             else:
                 keys = data.keys()
-                print(keys)
+                print(keys, file = self.stdout)
                 csv_writer = csv.DictWriter(data_file, keys)
             csv_writer.writeheader()
             csv_writer.writerow(data)
