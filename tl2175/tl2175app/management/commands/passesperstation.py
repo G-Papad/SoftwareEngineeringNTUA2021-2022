@@ -22,14 +22,16 @@ class Command(BaseCommand):
         savejson = options['savejson']
 
         station=Station.objects.filter(stationid=pk)
+
         if not station.exists():
-            print("Invalid arguments: Station does not exist")
+            print("Invalid arguments: Station does not exist", file = self.stdout)
             return
+        
         if(df>dt):
-            print("Invalid arguments: date_from > date_to")
+            print("Invalid arguments: date_from > date_to", file = self.stdout)
             return
 
-        station=station[0]
+        #station=station[0]
         name_from = df
         name_to = dt
 
@@ -39,7 +41,7 @@ class Command(BaseCommand):
             df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
-            print("Wrong DateTime Format")
+            print("Wrong DateTime Format", file = self.stdout)
             return
 
 
@@ -47,7 +49,7 @@ class Command(BaseCommand):
         header = requests.get(url).json()
 
         if format == 'json':
-            print(header)
+            print(header, file = self.stdout)
             name1 = "tl2175app/management/commands/results/json/PassesPerStation_" + pk + "_" + name_from + "_" + name_to + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:

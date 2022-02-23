@@ -1,0 +1,518 @@
+{
+	"id": "3e0d3186-5b02-4a67-9e8b-f8eb800e1092",
+	"name": "ConnectWays API testing",
+	"timestamp": "2022-02-23T02:42:18.783Z",
+	"collection_id": "19198553-c2abea3e-e4fa-4040-8f85-7eb64739da90",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 25,
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "0ff69e24-9458-4b24-9d32-90e0d1e99f23",
+			"name": "API ChargesBy Invalid Arguments",
+			"url": "http://127.0.0.1:8000/interoperability/api/ChargesBy/KO/20210101/20200101",
+			"time": 213,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 400": true,
+				"Body includes 'Invalid arguments: date_from > date_to'": true
+			},
+			"testPassFailCounts": {
+				"Status code is 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Body includes 'Invalid arguments: date_from > date_to'": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				213
+			],
+			"allTests": [
+				{
+					"Status code is 400": true,
+					"Body includes 'Invalid arguments: date_from > date_to'": true
+				}
+			]
+		},
+		{
+			"id": "bfc74f41-f628-4877-ba20-d164d149eac8",
+			"name": "API ChargesBy EGNATIA",
+			"url": "http://127.0.0.1:8000/interoperability/api/ChargesBy/EG/20201001/20201101",
+			"time": 208,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Corrct PPOList": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Corrct PPOList": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				208
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Corrct PPOList": true
+				}
+			]
+		},
+		{
+			"id": "45d11194-18d9-4183-8d57-a805733b3658",
+			"name": "API PassesPerStation GEFYRA 200",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesPerStation/GF00/20190601/20200101/",
+			"time": 1788,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Result is Correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Result is Correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1788
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Result is Correct": true
+				}
+			]
+		},
+		{
+			"id": "31756667-92e7-4cff-adc0-d38c6e0b76e0",
+			"name": "API PassesPerStation GEFYRA 400",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesPerStation/AA69/19900101/20200202/",
+			"time": 212,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Error 400 - Bad Request": true
+			},
+			"testPassFailCounts": {
+				"Error 400 - Bad Request": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				212
+			],
+			"allTests": [
+				{
+					"Error 400 - Bad Request": true
+				}
+			]
+		},
+		{
+			"id": "c9247939-a799-44c0-9d3b-ee12bc740c78",
+			"name": "API PassesAnalysis KO-OO",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesAnalysis/KO/OO/20211001/20211101/",
+			"time": 199,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Result is Correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Result is Correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				199
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Result is Correct": true
+				}
+			]
+		},
+		{
+			"id": "3daff49a-d825-47ea-bd29-efba15c319e4",
+			"name": "API PassesAnalysis Invalid provider",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesAnalysis/OO/KK/20211001/20211101/",
+			"time": 231,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 400 - Bad Request": true
+			},
+			"testPassFailCounts": {
+				"Status code is 400 - Bad Request": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				231
+			],
+			"allTests": [
+				{
+					"Status code is 400 - Bad Request": true
+				}
+			]
+		},
+		{
+			"id": "7043a585-63ae-4381-b676-f963cfc3ada1",
+			"name": "API PassesCost KO-OO",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesCost/KO/OO/20201001/20201101/",
+			"time": 211,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response time is less than 300ms": true,
+				"Result is Correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response time is less than 300ms": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Result is Correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				211
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response time is less than 300ms": true,
+					"Result is Correct": true
+				}
+			]
+		},
+		{
+			"id": "7bfb54a8-f529-413f-badb-3ab1a87c3f9c",
+			"name": "API PassesCost OO-KO",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesCost/OO/KO/20201001/20201101/",
+			"time": 195,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response time is less than 300ms": true,
+				"Result is Correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response time is less than 300ms": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Result is Correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				195
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response time is less than 300ms": true,
+					"Result is Correct": true
+				}
+			]
+		},
+		{
+			"id": "3da0f7b5-fa1f-41fe-b92e-fe25a34b7a9d",
+			"name": "API PassesUpdate Add Valid",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesUpdate/?format=json",
+			"time": 208,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				208
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "88f19082-b065-4fe5-b1cd-b8ba62aa5cd3",
+			"name": "API PassesUpdate Add Invalid 1",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesUpdate/?format=json",
+			"time": 225,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Error 400 - Bad Request": true
+			},
+			"testPassFailCounts": {
+				"Error 400 - Bad Request": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				225
+			],
+			"allTests": [
+				{
+					"Error 400 - Bad Request": true
+				}
+			]
+		},
+		{
+			"id": "2a042bd0-c8ea-4003-8d24-5681bc681a7e",
+			"name": "API PassesUpdate Add Invalid 2",
+			"url": "http://127.0.0.1:8000/interoperability/api/PassesUpdate/?format=jso",
+			"time": 46,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Error 404": true
+			},
+			"testPassFailCounts": {
+				"Error 404": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				46
+			],
+			"allTests": [
+				{
+					"Error 404": true
+				}
+			]
+		},
+		{
+			"id": "10a29967-836e-450b-b012-161ae052021b",
+			"name": "API ConfigurePayments AO-KO",
+			"url": "http://127.0.0.1:8000/interoperability/api/ConfigurePayments/AO/KO/20201001/20201101",
+			"time": 253,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Cost is correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Cost is correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				253
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Cost is correct": true
+				}
+			]
+		},
+		{
+			"id": "5fd88756-6536-43d9-ae10-feef5a894c28",
+			"name": "API ConfigurePayments AO-KO reversed",
+			"url": "http://127.0.0.1:8000/interoperability/api/ConfigurePayments/KO/AO/20201001/20201101",
+			"time": 250,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Cost is correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Cost is correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				250
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Cost is correct": true
+				}
+			]
+		},
+		{
+			"id": "22425685-426a-4ea4-a224-ca4ec81753a4",
+			"name": "API ConfigurePayments AO-KO reversed Copy",
+			"url": "http://127.0.0.1:8000/interoperability/api/ConfigurePayments/KO/KK/20201001/20201101",
+			"time": 209,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 400": true,
+				"Body matches string BadRequest": true
+			},
+			"testPassFailCounts": {
+				"Status code is 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Body matches string BadRequest": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				209
+			],
+			"allTests": [
+				{
+					"Status code is 400": true,
+					"Body matches string BadRequest": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 4448,
+	"collection": {
+		"requests": [
+			{
+				"id": "0ff69e24-9458-4b24-9d32-90e0d1e99f23",
+				"method": "GET"
+			},
+			{
+				"id": "bfc74f41-f628-4877-ba20-d164d149eac8",
+				"method": "GET"
+			},
+			{
+				"id": "45d11194-18d9-4183-8d57-a805733b3658",
+				"method": "GET"
+			},
+			{
+				"id": "31756667-92e7-4cff-adc0-d38c6e0b76e0",
+				"method": "GET"
+			},
+			{
+				"id": "c9247939-a799-44c0-9d3b-ee12bc740c78",
+				"method": "GET"
+			},
+			{
+				"id": "3daff49a-d825-47ea-bd29-efba15c319e4",
+				"method": "GET"
+			},
+			{
+				"id": "7043a585-63ae-4381-b676-f963cfc3ada1",
+				"method": "GET"
+			},
+			{
+				"id": "7bfb54a8-f529-413f-badb-3ab1a87c3f9c",
+				"method": "GET"
+			},
+			{
+				"id": "3da0f7b5-fa1f-41fe-b92e-fe25a34b7a9d",
+				"method": "POST"
+			},
+			{
+				"id": "88f19082-b065-4fe5-b1cd-b8ba62aa5cd3",
+				"method": "POST"
+			},
+			{
+				"id": "2a042bd0-c8ea-4003-8d24-5681bc681a7e",
+				"method": "POST"
+			},
+			{
+				"id": "10a29967-836e-450b-b012-161ae052021b",
+				"method": "GET"
+			},
+			{
+				"id": "5fd88756-6536-43d9-ae10-feef5a894c28",
+				"method": "GET"
+			},
+			{
+				"id": "22425685-426a-4ea4-a224-ca4ec81753a4",
+				"method": "GET"
+			}
+		]
+	}
+}
