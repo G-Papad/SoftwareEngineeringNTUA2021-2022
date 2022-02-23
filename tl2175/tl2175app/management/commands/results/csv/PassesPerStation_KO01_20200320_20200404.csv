@@ -1,0 +1,7 @@
+passid,timestamp,charge,vehicleRef,pass_type,PassIndex,TagProvider
+CLJ2137833,2020-03-20T21:53:00,2.50,IX01MVL33676,home,1,kentriki_odos
+CII8631766,2020-03-27T07:51:00,2.80,UO75YNW62238,home,2,kentriki_odos
+CHO0835399,2020-03-28T09:40:00,2.80,ED51EWW52190,home,3,kentriki_odos
+MLU6406429,2020-03-30T16:04:00,2.20,HW75BKT77773,home,4,kentriki_odos
+CDC9700930,2020-04-02T02:50:00,2.80,YH66OKD41942,home,5,kentriki_odos
+POV0246876,2020-04-02T08:50:00,1.00,WY00MLL63827,home,6,kentriki_odos

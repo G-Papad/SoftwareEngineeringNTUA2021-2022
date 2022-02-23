@@ -25,11 +25,13 @@ class Command(BaseCommand):
 
         provider1 = Provider.objects.filter(providerAbbr=op1)
         provider2 = Provider.objects.filter(providerAbbr=op2)
+        """
         if (not provider1.exists()) or (not provider2.exists()):
             print("Invalid arguments: Provider does not exist", file=self.stdout)
             return
+        """
         if(df > dt):
-            print("Invlide arguments: date_from > date_to", file=self.stdout)
+            print("Invalid arguments: date_from > date_to", file=self.stdout)
             return
         name_from = df
         name_to = dt
@@ -39,7 +41,9 @@ class Command(BaseCommand):
             df = datetime.strptime(df+"000000", "%Y%m%d%H%M%S").strftime(
                 "%Y-%m-%d %H:%M:%S")
         except:
-            print("Wrong DateTime Format")
+            print("Wrong DateTime Format", file = self.stdout)
+            return
+
 
         passes = Passes.objects.filter(passes_fk1__station_fk__providerAbbr=op1).filter(passes_fk2__vehicle_fk1__providerAbbr=op2).exclude(timestamp__gte=dt).filter(timestamp__gte=df)
         provider = Provider.objects.filter(providerAbbr=op1)
@@ -48,12 +52,12 @@ class Command(BaseCommand):
         response = requests.get(url).json()
         if format == 'json':
             print(response, file=self.stdout)
-            name1 = "tl2175app/management/commands/results/json/PassesCost" + op1 + "_"  + op2 + '_' + name_from + "_" + name_to + ".json"
+            name1 = "tl2175app/management/commands/results/json/PassesCost_" + op1 + "_"  + op2 + '_' + name_from + "_" + name_to + ".json"
             if savejson == 'yes':
                 with open(name1, 'w') as f:
                     json.dump(response, f)
         else:
-            name = "tl2175app/management/commands/results/csv/PassesCost" + op1 + "_" + op2 + '_' + name_from + "_" + name_to + ".csv"
+            name = "tl2175app/management/commands/results/csv/PassesCost_" + op1 + "_" + op2 + '_' + name_from + "_" + name_to + ".csv"
             data_file = open(name, 'w', newline = '')
             data = response
             if data == []:
