@@ -26,11 +26,11 @@ class Command(BaseCommand):
 
         provider1 = Provider.objects.filter(providerAbbr=op1_ID)
         provider2 = Provider.objects.filter(providerAbbr=op2_ID)
-        """
+
         if (not provider1.exists()) or (not provider2.exists()):
             print("Invalid arguments: Provider does not exist", file = self.stdout)
             return
-        """
+        
         if(df > dt):
             print("Invalid arguments: date_from > date_to", file = self.stdout)
             return

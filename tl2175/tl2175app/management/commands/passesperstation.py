@@ -22,11 +22,11 @@ class Command(BaseCommand):
         savejson = options['savejson']
 
         station=Station.objects.filter(stationid=pk)
-        """
+
         if not station.exists():
             print("Invalid arguments: Station does not exist", file = self.stdout)
             return
-        """
+        
         if(df>dt):
             print("Invalid arguments: date_from > date_to", file = self.stdout)
             return
