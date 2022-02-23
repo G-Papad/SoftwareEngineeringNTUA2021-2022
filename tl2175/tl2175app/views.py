@@ -1,4 +1,6 @@
+from asyncio.windows_events import NULL
 import io
+from pickle import FALSE
 from django.shortcuts import render
 from .models import Vehicle, Passes, Station, Provider
 #from django.forms import MemberForm
@@ -22,6 +24,11 @@ from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
 #import plotly.graph_objects as go
 #import plotly as px
+import pandas
+import plotly.graph_objects as go
+from plotly.offline import plot
+import plotly.express as px
+import plotly
 
 
 def upload_from_xslx(request):
@@ -104,6 +111,7 @@ def passupdt(request):
 
 def transauth(request):
     operator = Provider.objects.all()
+    plot_div = NULL
     if request.method == 'POST':
         form = request.POST
         dt = form["DateTo"]
@@ -114,7 +122,7 @@ def transauth(request):
         url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + \
             form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         passes = requests.get(url).json()
-        print(passes)
+        #print(passes)
         data = passes['PassesList']
         x = []
         y = []
@@ -124,12 +132,25 @@ def transauth(request):
             x.append(i['PassIndex'])
             y.append(i['timestamp'])
             #new_data = {'NumberOfPasses': i['PassIndex'], 'Date': i['timestamp']}
+        print(x)
+        print(y)
         #dataset = go.Scatter(x = x, y = y)
         #layout = go.Layout(xaxis=dict(title='Date'), yaxis=dict(title='Number Of Passes'))
         #fig = go.Figure(data=dataset, layout=layout)
         #plotly.offline.plot(fig,filename='positives.html',config={'displayModeBar': False})
         #fig.write_image("imaegs/fig1.png")
-    return render(request, 'transauth.html', {'operators': operator})
+        layout = go.Layout(
+            title = 'Title of the figure',
+            xaxis_title = 'X',
+            yaxis_title = 'Y',
+            height = 420,
+            width = 560,
+        )
+        #plot_div = go.Scatter(x = x, y = y, opacity=0.8, name="plot")
+        # fig = go.Figure(data = plot_div, layout = layout)
+        # plotly.io.write_html(fig, ".\tl2175\templates\plot1.html", full_html=False)
+        plot_div = plot({'data': [go.Scatter(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout}, output_type='div')
+    return render(request, 'transauth.html', context={'operators': operator, 'plot': plot_div})
 
 
 def passescost(request):
