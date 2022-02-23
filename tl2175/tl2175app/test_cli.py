@@ -13,9 +13,16 @@ import requests
 import os.path
 from os import path
 
+class PassesCostTest (TestCase):
+    @classmethod
+    def setUpTestData(self):
+        call_command('loaddata', 'db.json', verbosity=0)
+    def test_command_output(self):
+        out =StringIO()
+        call_command('passescost', op1='OO', op2='KO', datefrom='20201001', dateto='20201031', format='json', stdout=out)
+        self.assertIn('13.8', out.getvalue())
 
-
-class PassesAnalysisTest(TestCase):
+# class PassesAnalysisTest(TestCase):
     def do_command(self, *args, **options):
         with StringIO() as f:
             call_command(*args, **options, stdout = f)
@@ -53,11 +60,11 @@ class PassesAnalysisTest(TestCase):
 
         #add more tests for other instances
 
-class HealthCheckTest(TestCase):
-    def do_command(self, *args, **options):
-        with StringIO() as f:
-            call_command(*args, stdout = f)
-            return f.getvalue()
+# class HealthCheckTest(TestCase):
+#     def do_command(self, *args, **options):
+#         with StringIO() as f:
+#             call_command(*args, stdout = f)
+#             return f.getvalue()
     def test_healthcheck(self):
         text = self.do_command('healthcheck')
         self.assertEqual("[{'status': 'OK', 'dbconnection': 'Connected'}]\n\n", text)

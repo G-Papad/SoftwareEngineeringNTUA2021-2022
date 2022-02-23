@@ -44,7 +44,6 @@ class Command(BaseCommand):
         except:
             print("Wrong DateTime Format", file = self.stdout)
             return
-
         url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + op1_ID + '/' + op2_ID + '/' + name_from + '/' + name_to
         passes = requests.get(url).json()
 #savedata
