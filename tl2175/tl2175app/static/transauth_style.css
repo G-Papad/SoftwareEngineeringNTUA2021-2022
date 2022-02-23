@@ -1,7 +1,19 @@
 *{
     margin:0.5em;
     padding:0.5em;
-  }
+}
+
+body{
+  background-color: transparent;
+}
+
+.plotly-graph-div {
+  background-color: transparent;
+}
+
+.svg-container{
+  background-color: transparent;
+}
 
 .tr_form{
     display: flex;
