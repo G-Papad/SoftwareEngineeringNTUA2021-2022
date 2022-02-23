@@ -1,0 +1,142 @@
+{
+	"id": "c66a4942-64fe-44ba-a7bc-92bcf4c9fceb",
+	"name": "ConnectWays API Test admin",
+	"timestamp": "2022-02-23T02:47:58.778Z",
+	"collection_id": "19198553-9a92d752-dbb9-403f-a5b5-c940da1ddf58",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 4,
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "7daaa5a0-e0c3-4a39-b288-491b5be9aeb0",
+			"name": "API admin resetpasses ΟΚ",
+			"url": "http://127.0.0.1:8000/interoperability/api/admin/resetpasses?format=",
+			"time": 220,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Successful POST request": true
+			},
+			"testPassFailCounts": {
+				"Successful POST request": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				220
+			],
+			"allTests": [
+				{
+					"Successful POST request": true
+				}
+			]
+		},
+		{
+			"id": "7f4a9ad0-6c83-4144-b0b5-7e6cae73802c",
+			"name": "API admin resetvehicles OK",
+			"url": "http://127.0.0.1:8000/interoperability/api/admin/resetvehicles?format=",
+			"time": 713,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Successful POST request": true
+			},
+			"testPassFailCounts": {
+				"Successful POST request": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				713
+			],
+			"allTests": [
+				{
+					"Successful POST request": true
+				}
+			]
+		},
+		{
+			"id": "41c7e314-4404-4e76-bc3f-7dc42ef0de77",
+			"name": "API admin resetvehicles Not Found",
+			"url": "http://127.0.0.1:8000/interoperability/api/admin/resetvehicles?format=xlsx",
+			"time": 6,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Format Not Supported": true
+			},
+			"testPassFailCounts": {
+				"Format Not Supported": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Format Not Supported": true
+				}
+			]
+		},
+		{
+			"id": "cd8f1a58-f272-469c-8cf6-1bc5a03d945c",
+			"name": "API admin resetstations ΟΚ",
+			"url": "http://127.0.0.1:8000/interoperability/api/admin/resetstations?format=",
+			"time": 607,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Successful POST request": true
+			},
+			"testPassFailCounts": {
+				"Successful POST request": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				607
+			],
+			"allTests": [
+				{
+					"Successful POST request": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 1546,
+	"collection": {
+		"requests": [
+			{
+				"id": "7daaa5a0-e0c3-4a39-b288-491b5be9aeb0",
+				"method": "POST"
+			},
+			{
+				"id": "7f4a9ad0-6c83-4144-b0b5-7e6cae73802c",
+				"method": "POST"
+			},
+			{
+				"id": "41c7e314-4404-4e76-bc3f-7dc42ef0de77",
+				"method": "POST"
+			},
+			{
+				"id": "cd8f1a58-f272-469c-8cf6-1bc5a03d945c",
+				"method": "POST"
+			}
+		]
+	}
+}
