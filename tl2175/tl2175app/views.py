@@ -24,7 +24,8 @@ from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
 #import plotly.graph_objects as go
 #import plotly as px
-import pandas
+import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 from plotly.offline import plot
 import plotly.express as px
@@ -112,6 +113,7 @@ def passupdt(request):
 def transauth(request):
     operator = Provider.objects.all()
     plot_div = NULL
+    plot_div2 = NULL
     if request.method == 'POST':
         form = request.POST
         dt = form["DateTo"]
@@ -119,38 +121,62 @@ def transauth(request):
         print(form)
         dt = datetime.strptime(dt, "%Y-%m-%d").strftime("%Y%m%d")
         df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
+        # temp1 = datetime.strptime(dt, "%Y%m%d")
+        # temp2 = datetime.strptime(df, "%Y%m%d")
+        # temp_interval = temp2 - temp1
+        # day_interval = temp_interval.days
+        plot_type = form["Diagram Type"]
+        print(type(dt))
         url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + \
             form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         passes = requests.get(url).json()
         #print(passes)
-        data = passes['PassesList']
-        x = []
-        y = []
-        count = 0
-        for i in data:
-            #print(i['PassIndex'])
-            x.append(i['PassIndex'])
-            y.append(i['timestamp'])
-            #new_data = {'NumberOfPasses': i['PassIndex'], 'Date': i['timestamp']}
-        print(x)
-        print(y)
-        #dataset = go.Scatter(x = x, y = y)
-        #layout = go.Layout(xaxis=dict(title='Date'), yaxis=dict(title='Number Of Passes'))
-        #fig = go.Figure(data=dataset, layout=layout)
-        #plotly.offline.plot(fig,filename='positives.html',config={'displayModeBar': False})
-        #fig.write_image("imaegs/fig1.png")
-        layout = go.Layout(
-            title = 'Title of the figure',
-            xaxis_title = 'X',
-            yaxis_title = 'Y',
-            height = 420,
-            width = 560,
-        )
-        #plot_div = go.Scatter(x = x, y = y, opacity=0.8, name="plot")
-        # fig = go.Figure(data = plot_div, layout = layout)
-        # plotly.io.write_html(fig, ".\tl2175\templates\plot1.html", full_html=False)
-        plot_div = plot({'data': [go.Scatter(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout}, output_type='div')
-    return render(request, 'transauth.html', context={'operators': operator, 'plot': plot_div})
+        if plot_type=="Plot1":
+            data = passes['PassesList']
+            #x = temp1 + pd.to_timedelta(np.arange(day_interval), 'D')
+            x_index = pd.date_range(df, dt)
+            x = x_index.date
+            #print(type(x[0]))
+            y = []
+            for i in x:
+                passes_count = 0
+                for j in data:
+                    tempdate = datetime.strptime(j['timestamp'], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d")
+                    tempstring = i.strftime("%Y-%m-%d")
+                    if tempdate==tempstring:
+                        passes_count+=1
+                y.append(passes_count)
+            #print(x)
+            #print(y)
+            layout1 = go.Layout(
+                title = 'Passes per Day',
+                xaxis_title = 'Day',
+                yaxis_title = 'Number of Passes',
+                height = 420,
+                width = 560,
+            )
+            plot_div = plot({'data': [go.Scatter(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout1}, output_type='div')
+        elif plot_type=="Plot2":
+            data = passes['PassesList']
+            x = []
+            y = []
+            count = 0
+            for i in data:
+                #print(i['PassIndex'])
+                x.append(i['PassIndex'])
+                y.append(i['timestamp'])
+                #new_data = {'NumberOfPasses': i['PassIndex'], 'Date': i['timestamp']}
+            print(x)
+            print(y)
+            layout2 = go.Layout(
+                title = 'Diagram 2',
+                xaxis_title = 'X',
+                yaxis_title = 'Y',
+                height = 420,
+                width = 560,
+            )
+            plot_div2 = plot({'data': [go.Scatter(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout2}, output_type='div')
+    return render(request, 'transauth.html', context={'operators': operator, 'plot': plot_div, 'plot2': plot_div2})
 
 
 def passescost(request):
