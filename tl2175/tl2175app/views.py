@@ -127,7 +127,7 @@ def transauth(request):
         # day_interval = temp_interval.days
         plot_type = form["Diagram Type"]
         print(type(dt))
-        url = 'https://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + \
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesAnalysis/' + \
             form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         passes = requests.get(url, verify=False).json()
         #print(passes)
@@ -188,7 +188,7 @@ def passescost(request):
         print(form)
         dt = datetime.strptime(dt, "%Y-%m-%d").strftime("%Y%m%d")
         df = datetime.strptime(df, "%Y-%m-%d").strftime("%Y%m%d")
-        url = 'https://127.0.0.1:8000/interoperability/api/PassesCost/' + \
+        url = 'http://127.0.0.1:8000/interoperability/api/PassesCost/' + \
             form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         data = requests.get(url, verify=False).json()
         print(data)
