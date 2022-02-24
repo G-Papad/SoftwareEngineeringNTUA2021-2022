@@ -8,7 +8,7 @@
 Τέλος, ακόμη ένας στόχος είναι η συλλογή στατιστικών δεδομένων που θα χρησιμοποιηθούν από τους συγκοινωνιακούς φορείς.
 
 # Team
-- [Panagiotis Kokkinakis](https://github.com/kokkinakis115) (AM: 18115)
+- [Panagiotis Kokkinakis](https://github.com/kokkinakis115) (AM: 03118115)
 - [Christina Proestaki](https://github.com/chriproe) (AM: 03118877)
 - [Marina Kontalexi](https://github.com/marinakontalexi) (AM: 03118022)
 - [Kostas Mores](https://github.com/KostasMores) (AM: 03118073)
