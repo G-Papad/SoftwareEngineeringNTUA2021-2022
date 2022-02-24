@@ -1,2 +1,6 @@
 Operator1,Operator2,RequestTimestamp,PeriodFrom,PeriodTo,NumberOfPasses,PassesCost
+<<<<<<< HEAD
 KO,AO,2022-02-24 09:03:32,2020-03-20 00:00:00,2020-04-04 00:00:00,2,3.0
+=======
+KO,AO,2022-02-24 10:00:04,2020-03-20 00:00:00,2020-04-04 00:00:00,2,3.0
+>>>>>>> 941d5cc2bbe4342e7fbab4f93e48bac29e8d2537
