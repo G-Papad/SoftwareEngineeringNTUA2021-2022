@@ -66,9 +66,9 @@
     <!-- <div style="width:1000;height:100">
     {{ graph_div|safe }}
     </div> -->
-    <h5>Hello There! Graph is here!</h5>
     {% autoescape off %}
     {% if plot %}
+      <h5>Info Diagrams</h5>
       {{ plot }}
     {% endif %}
     {% endautoescape %}
