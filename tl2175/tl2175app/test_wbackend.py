@@ -13,20 +13,20 @@ import requests
 import os.path
 from os import path
 
-class SetUp(TestCase):
-    @classmethod
-    def setUpTestData(self):
-        call_command('loaddata', 'db.json', verbosity=0)
+# class SetUp(TestCase):
+#     @classmethod
+#     def setUpTestData(self):
+#         call_command('loaddata', 'db.json', verbosity=0)
 
-class ResetPasses(TestCase):
-    def do_command(self, *args, **options):
-        with StringIO() as f:
-            call_command(*args, stdout = f)
-            return f.getvalue()
+# class ResetPasses(TestCase):
+#     def do_command(self, *args, **options):
+#         with StringIO() as f:
+#             call_command(*args, stdout = f)
+#             return f.getvalue()
 
-    def test_resetpasses_db(self):
-        text = self.do_command('resetpasses')
-        self.assertEqual(Passes.DoesNotExist, True)
-        self.assertEqual(Station.Exists, True)
-        self.assertEqual(Provider.Exists, True)
-        self.assertEqual(Vehicle.Exists, True)
+#     def test_resetpasses_db(self):
+#         text = self.do_command('resetpasses')
+#         self.assertEqual(Passes.DoesNotExist, True)
+#         self.assertEqual(Station.Exists, True)
+#         self.assertEqual(Provider.Exists, True)
+#         self.assertEqual(Vehicle.Exists, True)
