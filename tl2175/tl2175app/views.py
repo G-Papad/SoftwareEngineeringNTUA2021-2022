@@ -22,13 +22,15 @@ import csv
 import requests
 from datetime import datetime
 from django.core.exceptions import ValidationError, BadRequest
-#import plotly.graph_objects as go
-#import plotly as px
+"""
+import plotly.graph_objects as go
+import plotly as px
 import pandas
 import plotly.graph_objects as go
 from plotly.offline import plot
 import plotly.express as px
 import plotly
+"""
 
 
 def upload_from_xslx(request):
@@ -139,6 +141,7 @@ def transauth(request):
         #fig = go.Figure(data=dataset, layout=layout)
         #plotly.offline.plot(fig,filename='positives.html',config={'displayModeBar': False})
         #fig.write_image("imaegs/fig1.png")
+        """
         layout = go.Layout(
             title = 'Title of the figure',
             xaxis_title = 'X',
@@ -150,6 +153,7 @@ def transauth(request):
         # fig = go.Figure(data = plot_div, layout = layout)
         # plotly.io.write_html(fig, ".\tl2175\templates\plot1.html", full_html=False)
         plot_div = plot({'data': [go.Scatter(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout}, output_type='div')
+        """
     return render(request, 'transauth.html', context={'operators': operator, 'plot': plot_div})
 
 
