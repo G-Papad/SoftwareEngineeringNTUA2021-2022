@@ -131,7 +131,7 @@ def transauth(request):
             form["op1"] + '/' + form["op2"] + '/' + df + '/' + dt
         passes = requests.get(url, verify=False).json()
         #print(passes)
-        if plot_type=="Plot1":
+        if plot_type=="Scatter Diagram":
             data = passes['PassesList']
             #x = temp1 + pd.to_timedelta(np.arange(day_interval), 'D')
             x_index = pd.date_range(df, dt)
@@ -156,7 +156,7 @@ def transauth(request):
                 width = 560,
             )
             plot_div = plot({'data': [go.Scatter(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout1}, output_type='div')
-        elif plot_type=="Plot2":
+        elif plot_type=="Bar Diagram":
             data = passes['PassesList']
             #x = temp1 + pd.to_timedelta(np.arange(day_interval), 'D')
             x_index = pd.date_range(df, dt)
@@ -173,15 +173,15 @@ def transauth(request):
                 y.append(passes_count)
             #print(x)
             #print(y)
-            layout2 = go.Layout(
+            layout = go.Layout(
                 title = 'Passes per Day Bar',
                 xaxis_title = 'Day',
                 yaxis_title = 'Number of Passes',
                 height = 420,
                 width = 560,
             )
-            plot_div2 = plot({'data': [go.Bar(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout2}, output_type='div')
-    return render(request, 'transauth.html', context={'operators': operator, 'plot': plot_div, 'plot2': plot_div2})
+            plot_div = plot({'data': [go.Bar(x = x, y = y, opacity=0.8, name="plot")], 'layout': layout}, output_type='div')
+    return render(request, 'transauth.html', context={'operators': operator, 'plot': plot_div})
 
 
 def passescost(request):
