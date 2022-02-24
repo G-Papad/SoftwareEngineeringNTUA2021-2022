@@ -107,8 +107,35 @@ def info(request):
 
 
 def passupdt(request):
-    return(render(request, 'passupdt.html'))
-
+    if request.method == 'POST':
+        dataset = Dataset()
+        csv_file = request.FILES['myfile']
+        csvreader = csv.reader(io.StringIO(
+            csv_file.read().decode('utf-8')), delimiter=';')
+        header = next(csvreader)
+        # imported_data = dataset.load(io.StringIO(
+        #     csv_file.read().decode('utf-8')), 'csv')
+        # print(imported_data)
+        for data in csvreader:
+            try:
+                if data[0] == None:
+                    break
+                value = Passes()
+                value.passid = data[0]
+                value.timestamp = datetime.strptime(
+                    data[1], "%d/%m/%Y %H:%M")
+                value.charge = data[4]
+                value.passes_fk1 = Station.objects.get(stationid=data[2])
+                value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])
+                try:
+                    value.full_clean()
+                except ValidationError:
+                    raise BadRequest("Error 400 - Bad Request")
+                value.save()
+            except:
+                raise BadRequest("Error 400 - Bad Request")
+    return render(request, 'passupdt.html')
+   
 
 def transauth(request):
     operator = Provider.objects.all()
@@ -422,6 +449,7 @@ class PassesUpdate(APIView):
         snippets = Passes.objects.all()
         serializer = PassesSerializerAll(snippets, many=True)
         return Response(serializer.data)
+        # return(render(request, 'passupdt.html'))
 
     def post(self, request):
         try:

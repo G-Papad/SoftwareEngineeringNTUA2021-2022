@@ -11,5 +11,14 @@
   {%include "base.html"%}
   {% csrf_token %}
   <h2>Enter a pass</h2>
+  <form method="post" enctype="multipart/form-data" name="passupd_form">
+    {% csrf_token %}
+    <h3>Upload your csv file</h3>
+    <div class="submit-container">
+        <input type="file" name="myfile">
+        <br>
+        <button id="button-17" type="submit">Upload</button>
+    </div>
+</form>
 </body>
 </html>

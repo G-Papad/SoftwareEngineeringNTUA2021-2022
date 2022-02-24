@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 data = row[0].split(';')
                 value.passid = data[0]
                 value.timestamp = datetime.strptime(
-                    data[1], "%d/%m/%Y %H:%M")
+                    data[1], "%Y/%m/%d %H:%M:%S")
                 value.charge = data[4]
                 value.passes_fk1 = Station.objects.get(stationid=data[2])
                 value.passes_fk2 = Vehicle.objects.get(vehicleid=data[3])

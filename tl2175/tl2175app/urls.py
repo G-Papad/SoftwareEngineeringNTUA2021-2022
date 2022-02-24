@@ -6,7 +6,7 @@ from django.urls import path, include, re_path
 urlpatterns = [
     path('', views.mainpage, name='mainpage'),
     path('upload/', views.upload_from_xslx, name='upload'),
-    # path('PassesUpdate/', views.passupdt, name='passupdt'),
+    path('passesUpdate/', views.passupdt, name='passupdt'),
     path('PassesAnalysis', views.transauth, name='transauth'),
     path('PassesUpdate/', views.PassesUpdate.as_view()),
     path('PassesPerStation/<str:pk>/<str:df>/<str:dt>/',
